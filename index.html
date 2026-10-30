@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Proyectos de Miguel</title>
+<meta name="description" content="Todos los proyectos de Miguel Rodríguez Saiz · ArduSolutions">
+<meta name="color-scheme" content="light dark">
+<style>
+:root{--bg:#fbfbfd;--bg2:#f5f5f7;--card:#fff;--fg:#1d1d1f;--fg2:#6e6e73;--line:rgba(0,0,0,.08);--accent:#0071e3;--nav:rgba(251,251,253,.72);--shadow:0 2px 6px rgba(0,0,0,.04),0 12px 32px rgba(0,0,0,.06)}
+@media (prefers-color-scheme:dark){:root{--bg:#000;--bg2:#0b0b0d;--card:#1c1c1e;--fg:#f5f5f7;--fg2:#a1a1a6;--line:rgba(255,255,255,.1);--accent:#2997ff;--nav:rgba(22,22,23,.72);--shadow:0 0 0 1px rgba(255,255,255,.06)}}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:64px}
+body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Helvetica Neue",Helvetica,Arial,sans-serif;background:var(--bg);color:var(--fg);-webkit-font-smoothing:antialiased;line-height:1.47;letter-spacing:-.01em}
+a{color:inherit;text-decoration:none}
+nav{position:sticky;top:0;z-index:10;backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);background:var(--nav);border-bottom:1px solid var(--line)}
+.navin{max-width:1080px;margin:0 auto;display:flex;align-items:center;gap:28px;height:52px;padding:0 22px;overflow-x:auto;scrollbar-width:none}
+.navin::-webkit-scrollbar{display:none}
+.brand{font-weight:600;font-size:17px;white-space:nowrap;margin-right:auto}
+.navin a:not(.brand){font-size:12.5px;color:var(--fg2);white-space:nowrap;transition:color .2s}
+.navin a:not(.brand):hover{color:var(--fg)}
+header{text-align:center;padding:120px 22px 96px;background:linear-gradient(180deg,var(--bg) 0%,var(--bg2) 100%)}
+.eyebrow{font-size:17px;font-weight:600;color:var(--accent);margin-bottom:10px}
+h1{font-size:clamp(44px,8vw,88px);font-weight:700;letter-spacing:-.035em;line-height:1.04;background:linear-gradient(90deg,#1d1d1f,#5e5ce6 55%,#0071e3);-webkit-background-clip:text;background-clip:text;color:transparent}
+@media (prefers-color-scheme:dark){h1{background:linear-gradient(90deg,#f5f5f7,#bf5af2 55%,#2997ff);-webkit-background-clip:text;background-clip:text}}
+.sub{font-size:clamp(19px,2.4vw,26px);color:var(--fg2);max-width:680px;margin:20px auto 0;font-weight:400}
+.stats{display:flex;justify-content:center;gap:48px;margin-top:48px;flex-wrap:wrap}
+.stats div{font-size:14px;color:var(--fg2)}.stats b{display:block;font-size:40px;color:var(--fg);font-weight:600;letter-spacing:-.02em}
+main{max-width:1080px;margin:0 auto;padding:0 22px}
+.sec{padding:88px 0 8px}
+.sec h2{font-size:clamp(32px,4.4vw,48px);font-weight:700;letter-spacing:-.03em;margin-bottom:32px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px}
+.card{background:var(--card);border-radius:22px;padding:28px 28px 26px;box-shadow:var(--shadow);display:flex;flex-direction:column;transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s}
+.card:hover{transform:translateY(-4px) scale(1.01)}
+.card h3{font-size:24px;font-weight:600;letter-spacing:-.02em;margin:14px 0 6px}
+.tag{font-size:17px;color:var(--fg)}
+.desc{font-size:15px;color:var(--fg2);margin-top:10px}
+.meta{font-size:13px;color:var(--fg2);margin-top:auto;padding-top:18px}
+.pills{display:flex;gap:6px;flex-wrap:wrap}
+.pill{font-size:12px;font-weight:600;padding:4px 10px;border-radius:999px}
+.ok{background:rgba(52,199,89,.14);color:#248a3d}.dev{background:rgba(255,149,0,.15);color:#c93400}
+.local{background:rgba(88,86,214,.13);color:#5856d6}.priv{background:rgba(142,142,147,.16);color:var(--fg2)}.off{background:rgba(255,59,48,.12);color:#d70015}
+@media (prefers-color-scheme:dark){.ok{color:#30d158}.dev{color:#ff9f0a}.local{color:#a5a3ff}.off{color:#ff6961}}
+.btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.btn{font-size:14px;padding:8px 16px;border-radius:999px;border:1px solid var(--line);color:var(--accent);transition:background .2s}
+.btn:hover{background:var(--bg2)}
+.btn.primary{background:var(--accent);color:#fff;border-color:transparent}.btn.primary:hover{filter:brightness(1.08);background:var(--accent)}
+.muted h2{font-size:24px;color:var(--fg2)}
+.card.small{opacity:.75;padding:22px}.card.small h3{font-size:19px}
+.strip{display:flex;justify-content:center;flex-wrap:wrap;gap:10px;margin:48px auto 0;max-width:860px}
+.stat{background:var(--card);box-shadow:var(--shadow);border-radius:18px;padding:14px 20px;font-size:13px;color:var(--fg2);min-width:110px;display:flex;flex-direction:column;align-items:center;gap:2px}
+.stat b{font-size:30px;color:var(--fg);font-weight:600;letter-spacing:-.02em;line-height:1.1}
+.stat.total{background:var(--fg);}.stat.total b,.stat.total{color:var(--bg)}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin:2px 0}
+.dot.ok{background:#34c759}.dot.dev{background:#ff9500}.dot.exp{background:#af52de}.dot.done{background:#0071e3}.dot.idea{background:#8e8e93}
+.exp{background:rgba(175,82,222,.14);color:#8944ab}.done{background:rgba(0,113,227,.12);color:#0066cc}.idea{background:rgba(142,142,147,.16);color:#636366}
+.prio{background:transparent;border:1px solid var(--line);color:var(--fg2)}.prio.hi{border-color:rgba(255,59,48,.4);color:#d70015}
+.count{font-size:.5em;color:var(--fg2);font-weight:500;vertical-align:middle}
+.lead{color:var(--fg2);font-size:17px;margin:-16px 0 28px}
+.privlabel{font-size:12px;color:var(--fg2);display:inline-flex;align-items:center;gap:6px;padding:6px 0}.privlabel::before{content:"";width:10px;height:10px;border-radius:3px;border:1.5px solid currentColor;opacity:.7}
+.meta .localnote{color:#5856d6;font-weight:500}
+@media (prefers-color-scheme:dark){.exp{color:#da8fff}.done{color:#64d2ff}.idea{color:#aeaeb2}.prio.hi{color:#ff6961}.meta .localnote{color:#a5a3ff}}
+@media (max-width:600px){.stat{min-width:96px;padding:12px 14px}}
+footer{text-align:center;color:var(--fg2);font-size:12px;padding:96px 22px 48px;border-top:1px solid var(--line);margin-top:96px}
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .8s ease,transform .8s cubic-bezier(.2,.8,.2,1)}
+.reveal.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}}
+@media (max-width:600px){header{padding:80px 20px 64px}.grid{grid-template-columns:1fr}.navin{gap:20px}.stats{gap:28px}}
+</style>
+</head>
+<body>
+<nav><div class="navin"><a class="brand" href="#">Proyectos</a><a href="#ia">IA</a><a href="#sistemas">Sistemas</a><a href="#hardware">Hardware</a><a href="#herramientas">Herramientas</a><a href="#web">Web</a><a href="#juegos">Juegos</a><a href="#otros">Otros</a></div></nav>
+<header>
+  <p class="eyebrow">ArduSolutions</p>
+  <h1>Proyectos de Miguel</h1>
+  <p class="sub">Inteligencia artificial local, hardware propio, sistemas y apps. Todo lo que estoy construyendo, en un solo sitio.</p>
+  <div class="strip reveal in"><div class="stat total"><b>22</b>proyectos</div><div class="stat"><b>3</b><span class="dot dev"></span>En desarrollo</div><div class="stat"><b>10</b><span class="dot ok"></span>Funcional</div><div class="stat"><b>6</b><span class="dot exp"></span>Experimental</div><div class="stat"><b>1</b><span class="dot done"></span>Terminado</div><div class="stat"><b>2</b><span class="dot idea"></span>Idea</div></div>
+</header>
+<main>
+<section id="ia" class="sec"><h2 class="reveal">IA <span class="count">3</span></h2><div class="grid"><article class="card reveal" id="sopa-ia">
+  <div class="pills"><span class="pill dev">En desarrollo</span><span class="pill prio hi">Prioridad alta</span></div>
+  <h3>SOPA IA</h3>
+  <p class="tag">Tu propia plataforma de inteligencia artificial local.</p><p class="desc">Sopa Desktop: chat con modelos locales y personalización (LoRA/QLoRA y DPO) en GPUs NVIDIA domésticas, en español y sin nube. Instalador para Windows.</p>
+  <p class="meta">Actualizado el 30 oct 2026</p>
+  <div class="btns"><a class="btn primary" href="https://ardu01.github.io/sopa-web/" target="_blank" rel="noopener">Ver web</a><span class="privlabel">Repositorio privado</span></div>
+</article><article class="card reveal" id="motor-ligero">
+  <div class="pills"><span class="pill exp">Experimental</span><span class="pill prio mid">Prioridad media</span></div>
+  <h3>Motor ligero</h3>
+  <p class="tag">Investigación de un motor de IA local más eficiente.</p><p class="desc">Prototipo para correr LLM MoE muy grandes (objetivo Qwen3-235B) en portátiles modestos: streaming de pesos desde el SSD, decodificación especulativa y caché de expertos.</p>
+  <p class="meta">Actualizado el 29 oct 2026</p>
+  <div class="btns"><span class="privlabel">Repositorio privado</span></div>
+</article><article class="card reveal" id="alfred">
+  <div class="pills"><span class="pill exp">Experimental</span><span class="pill prio lo">Prioridad baja</span></div>
+  <h3>Alfred</h3>
+  <p class="tag">Proyecto de agente especializado en el ámbito legal.</p>
+  <p class="meta"><span class="localnote">Guardado en local · Próximamente en GitHub</span></p>
+  
+</article></div></section>
+<section id="sistemas" class="sec"><h2 class="reveal">Sistemas <span class="count">4</span></h2><div class="grid"><article class="card reveal" id="orbit-os">
+  <div class="pills"><span class="pill ok">Funcional</span><span class="pill prio hi">Prioridad alta</span></div>
+  <h3>Orbit OS</h3>
+  <p class="tag">Sistema para la Raspberry Pi con interfaz propia.</p><p class="desc">Orbit OS 1.0.0 (React + TypeScript) corre en la Raspberry Pi y en el HP del Orbit Terminal: inicio, sistemas, hardware, controles, Ardu Lab y herramientas.</p>
+  <p class="meta">Actualizado el 24 oct 2026 · <span class="localnote">Vive dentro del repositorio Control-deck.</span></p>
+  <div class="btns"><a class="btn" href="https://github.com/Sopa-IA/Control-deck/tree/HEAD/software/interface" target="_blank" rel="noopener">Repositorio</a></div>
+</article><article class="card reveal" id="sopaos">
+  <div class="pills"><span class="pill ok">Funcional</span><span class="pill prio mid">Prioridad media</span></div>
+  <h3>SopaOS</h3>
+  <p class="tag">Escritorio virtual estilo macOS integrado en SOPA.</p>
+  <p class="meta"><span class="localnote">Guardado en local · Próximamente en GitHub</span></p>
+  
+</article><article class="card reveal" id="os-apple">
+  <div class="pills"><span class="pill exp">Experimental</span><span class="pill prio mid">Prioridad media</span></div>
+  <h3>OS estilo Apple Pi</h3>
+  <p class="tag">Entorno Linux para Raspberry Pi inspirado en macOS.</p>
+  <p class="meta"><span class="localnote">Guardado en local · Próximamente en GitHub</span></p>
+  
+</article><article class="card reveal" id="ardu-os">
+  <div class="pills"><span class="pill exp">Experimental</span><span class="pill prio lo">Prioridad baja</span></div>
+  <h3>Ardu OS</h3>
+  <p class="tag">Experimento de distribución Linux propia basada en Debian.</p>
+  <p class="meta"><span class="localnote">Guardado en local · Próximamente en GitHub</span></p>
+  
+</article></div></section>
+<section id="hardware" class="sec"><h2 class="reveal">Hardware <span class="count">3</span></h2><div class="grid"><article class="card reveal" id="orbit-terminal">
+  <div class="pills"><span class="pill ok">Funcional</span><span class="pill prio hi">Prioridad alta</span></div>
+  <h3>Orbit Terminal</h3>
+  <p class="tag">Cyberdeck físico con Raspberry Pi, mini HP y electrónica.</p><p class="desc">Terminal de sobremesa en forma de cuña que une un HP reutilizado y una Raspberry Pi 4 con Orbit OS, con consola de mandos física (Arduino Nano) y luces ámbar. Prototipo: la carcasa aún no está lista para fabricar.</p>
+  <p class="meta">Actualizado el 24 oct 2026 · <span class="localnote">El repositorio se llama Control-deck.</span></p>
+  <div class="btns"><a class="btn primary" href="https://sopa-ia.github.io/orbit-web/" target="_blank" rel="noopener">Ver web</a><a class="btn" href="https://github.com/Sopa-IA/Control-deck" target="_blank" rel="noopener">Repositorio</a></div>
+</article><article class="card reveal" id="sopa-deck">
+  <div class="pills"><span class="pill idea">Idea</span><span class="pill prio lo">Prioridad baja</span></div>
+  <h3>SOPA Deck</h3>
+  <p class="tag">Concepto de interfaz auxiliar mediante iPad.</p><p class="desc">Concepto: centro de control táctil para Windows desde iPad, iPhone y Android. Tiene repositorio privado con trabajo previo.</p>
+  <p class="meta">Actualizado el 19 oct 2026</p>
+  <div class="btns"><span class="privlabel">Repositorio privado</span></div>
+</article><article class="card reveal" id="android-deck">
+  <div class="pills"><span class="pill idea">Idea</span><span class="pill prio lo">Prioridad baja</span></div>
+  <h3>Android Deck</h3>
+  <p class="tag">Idea de deck de control basado en Android.</p>
+  <p class="meta"><span class="localnote">Guardado en local · Próximamente en GitHub</span></p>
+  
+</article></div></section>
+<section id="herramientas" class="sec"><h2 class="reveal">Herramientas <span class="count">5</span></h2><div class="grid"><article class="card reveal" id="monitor-msi">
+  <div class="pills"><span class="pill ok">Funcional</span><span class="pill prio hi">Prioridad alta</span></div>
+  <h3>Monitor Hardware MSI</h3>
+  <p class="tag">Telemetría en tiempo real de tus ordenadores.</p>
+  <p class="meta"><span class="localnote">Guardado en local · Próximamente en GitHub</span></p>
+  
+</article><article class="card reveal" id="project-manager">
+  <div class="pills"><span class="pill dev">En desarrollo</span><span class="pill prio hi">Prioridad alta</span></div>
+  <h3>Project Manager</h3>
+  <p class="tag">Asistente gestor de todos los proyectos y esta web.</p>
+  <p class="meta"><span class="localnote">Guardado en local · Próximamente en GitHub</span></p>
+  
+</article><article class="card reveal" id="rea-desktop">
+  <div class="pills"><span class="pill done">Terminado</span><span class="pill prio mid">Prioridad media</span></div>
+  <h3>REA Desktop</h3>
+  <p class="tag">Aplicación para descargar y utilizar REA con Codex desde el ordenador.</p>
+  <p class="meta"><span class="localnote">Guardado en local · Próximamente en GitHub</span></p>
+  
+</article><article class="card reveal" id="axiom-lab">
+  <div class="pills"><span class="pill exp">Experimental</span><span class="pill prio mid">Prioridad media</span></div>
+  <h3>Mobile Electronics &amp; 3D Lab</h3>
+  <p class="tag">Aplicación de electrónica, simulación y diseño 3D.</p><p class="desc">AXIOM Lab, prototipo alfa para iPhone: esquemas con símbolos arrastrables, conexiones entre pines, cálculo DC resistivo básico y lienzo 3D con exportación STL.</p>
+  <p class="meta">Actualizado el 24 oct 2026</p>
+  <div class="btns"><a class="btn primary" href="https://ardu01.github.io/axiom-lab/" target="_blank" rel="noopener">Ver web</a><a class="btn" href="https://github.com/ardu01/axiom-lab" target="_blank" rel="noopener">Repositorio</a></div>
+</article><article class="card reveal" id="cad">
+  <div class="pills"><span class="pill exp">Experimental</span><span class="pill prio mid">Prioridad media</span></div>
+  <h3>CAD propio</h3>
+  <p class="tag">Desarrollo inicial de una alternativa a SolidWorks.</p>
+  <p class="meta"><span class="localnote">Guardado en local · Próximamente en GitHub</span></p>
+  
+</article></div></section>
+<section id="web" class="sec"><h2 class="reveal">Web <span class="count">5</span></h2><div class="grid"><article class="card reveal" id="sopa-web">
+  <div class="pills"><span class="pill ok">Funcional</span><span class="pill prio mid">Prioridad media</span></div>
+  <h3>SOPA Web</h3>
+  <p class="tag">Página web de presentación de SOPA.</p><p class="desc">Web estática de Sopa: IA local y privada para Windows, en español. HTML, CSS y JS sin dependencias, sin cookies ni rastreadores.</p>
+  <p class="meta">Actualizado el 30 oct 2026</p>
+  <div class="btns"><a class="btn primary" href="https://ardu01.github.io/sopa-web/" target="_blank" rel="noopener">Ver web</a><a class="btn" href="https://github.com/ardu01/sopa-web" target="_blank" rel="noopener">Repositorio</a></div>
+</article><article class="card reveal" id="orbit-web">
+  <div class="pills"><span class="pill ok">Funcional</span><span class="pill prio mid">Prioridad media</span></div>
+  <h3>Orbit Web</h3>
+  <p class="tag">Página web del proyecto Orbit y su montaje.</p><p class="desc">Web del Orbit Terminal con la evolución del prototipo, fotos reales y una animación de montaje por scroll renderizada en Blender a partir del CAD.</p>
+  <p class="meta">Actualizado el 23 oct 2026</p>
+  <div class="btns"><a class="btn primary" href="https://sopa-ia.github.io/orbit-web/" target="_blank" rel="noopener">Ver web</a><a class="btn" href="https://github.com/Sopa-IA/orbit-web" target="_blank" rel="noopener">Repositorio</a></div>
+</article><article class="card reveal" id="project-hub">
+  <div class="pills"><span class="pill ok">Funcional</span><span class="pill prio mid">Prioridad media</span></div>
+  <h3>Project Hub</h3>
+  <p class="tag">Escritorio futurista para acceder a tus proyectos.</p>
+  <p class="meta">Actualizado el 24 oct 2026</p>
+  <div class="btns"><a class="btn primary" href="https://ardu01.github.io/Project-Hub-OS/" target="_blank" rel="noopener">Ver web</a><a class="btn" href="https://github.com/ardu01/Project-Hub-OS" target="_blank" rel="noopener">Repositorio</a></div>
+</article><article class="card reveal" id="fairway">
+  <div class="pills"><span class="pill ok">Funcional</span><span class="pill prio mid">Prioridad media</span></div>
+  <h3>Fairway Golf</h3>
+  <p class="tag">Evolución de tu aplicación de golf.</p><p class="desc">Marcador de golf personal para el iPhone: golpes, putts, bruto, neto y Stableford, hándicap WHS y varios jugadores, sin cuenta y sin cobertura.</p>
+  <p class="meta">Actualizado el 14 oct 2026</p>
+  <div class="btns"><a class="btn primary" href="https://ardu01.github.io/app-golf/" target="_blank" rel="noopener">Ver web</a><a class="btn" href="https://github.com/ardu01/app-golf" target="_blank" rel="noopener">Repositorio</a><a class="btn" href="https://github.com/ardu01/app-golf/releases/tag/v5.1.6" target="_blank" rel="noopener">Última versión · v5.1.6</a></div>
+</article><article class="card reveal" id="clash-progreso">
+  <div class="pills"><span class="pill ok">Funcional</span><span class="pill prio lo">Prioridad baja</span></div>
+  <h3>Clash Progreso</h3>
+  <p class="tag">Aplicación para gestionar tus 11 cuentas de Clash of Clans.</p><p class="desc">PWA para el iPhone que calcula el avance de cada aldea hacia el máximo del ayuntamiento y las compara. Sin login ni servidor. Versión 4.2.9. Contenido de fans no oficial.</p>
+  <p class="meta">Actualizado el 14 oct 2026</p>
+  <div class="btns"><a class="btn primary" href="https://ardu01.github.io/clash-progreso/" target="_blank" rel="noopener">Ver web</a><a class="btn" href="https://github.com/ardu01/clash-progreso" target="_blank" rel="noopener">Repositorio</a></div>
+</article></div></section>
+<section id="juegos" class="sec"><h2 class="reveal">Juegos <span class="count">2</span></h2><div class="grid"><article class="card reveal" id="eon">
+  <div class="pills"><span class="pill dev">En desarrollo</span><span class="pill prio mid">Prioridad media</span></div>
+  <h3>Simulador WorldBox</h3>
+  <p class="tag">Juego de civilizaciones y evolución de sociedades.</p><p class="desc">EON — Historia de la Humanidad (v0.5.0): sandbox de civilizaciones en PWA. Inspecciona personas, ciudades y bosques y sigue la crónica de la humanidad.</p>
+  <p class="meta">Actualizado el 27 oct 2026</p>
+  <div class="btns"><a class="btn primary" href="https://ardu01.github.io/Eon/" target="_blank" rel="noopener">Ver web</a><a class="btn" href="https://github.com/ardu01/Eon" target="_blank" rel="noopener">Repositorio</a></div>
+</article><article class="card reveal" id="tower-defense">
+  <div class="pills"><span class="pill ok">Funcional</span><span class="pill prio lo">Prioridad baja</span></div>
+  <h3>Tower Defense</h3>
+  <p class="tag">Videojuego PWA con oleadas, torres y dificultad ajustable.</p><p class="desc">NEON BASTION: tower defense futurista con tres mapas, 20 oleadas, cuatro tipos de torre con cuatro niveles, jefes y récord local.</p>
+  <p class="meta">Actualizado el 25 oct 2026</p>
+  <div class="btns"><a class="btn primary" href="https://ardu01.github.io/Tower-defense/" target="_blank" rel="noopener">Ver web</a><a class="btn" href="https://github.com/ardu01/Tower-defense" target="_blank" rel="noopener">Repositorio</a></div>
+</article></div></section>
+<section id="otros" class="sec muted"><h2 class="reveal">Otros repositorios</h2><p class="lead reveal">Repositorios de GitHub que no forman parte de la tabla de proyectos.</p><div class="grid"><article class="card reveal" id="ardu-scada">
+  
+  <h3>ArduSCADA</h3>
+  <p class="tag">Supervisión industrial local para Windows.</p><p class="desc">App de escritorio WPF con adquisición Modbus TCP, sinóptico, tendencias, alarmas e informes. Solo lectura: no escribe en PLC.</p>
+  <p class="meta">Actualizado el 15 oct 2026</p>
+  <div class="btns"><span class="privlabel">Repositorio privado</span></div>
+</article><article class="card reveal" id="ardufiles">
+  
+  <h3>ArduFiles</h3>
+  <p class="tag">Gestión documental local y privada de ArduSolutions.</p><p class="desc">En construcción.</p>
+  <p class="meta">Actualizado el 16 oct 2026</p>
+  <div class="btns"><span class="privlabel">Repositorio privado</span></div>
+</article><article class="card reveal" id="estudio-ruso">
+  
+  <h3>Estudio Ruso</h3>
+  <p class="tag">PWA para aprender ruso básico desde cero.</p><p class="desc">Alfabeto, sílabas, mazos con repaso espaciado, gramática y diálogos. Sin cuenta ni analítica: el progreso se queda en el navegador.</p>
+  <p class="meta">Actualizado el 14 oct 2026</p>
+  <div class="btns"><a class="btn primary" href="https://ardu01.github.io/estudio-ruso/" target="_blank" rel="noopener">Ver web</a><a class="btn" href="https://github.com/ardu01/estudio-ruso" target="_blank" rel="noopener">Repositorio</a></div>
+</article><article class="card reveal" id="golf-lab">
+  
+  <h3>Golf Performance Lab</h3>
+  <p class="tag">PWA de rendimiento de golf.</p><p class="desc">Bolsa, wedges, putting, caddie y estadísticas. Los datos se guardan en el navegador.</p>
+  <p class="meta">Actualizado el 14 oct 2026</p>
+  <div class="btns"><a class="btn primary" href="https://ardu01.github.io/golf-lab/" target="_blank" rel="noopener">Ver web</a><a class="btn" href="https://github.com/ardu01/golf-lab" target="_blank" rel="noopener">Repositorio</a></div>
+</article><article class="card reveal" id="nexus-01">
+  
+  <h3>NEXUS / 01</h3>
+  <p class="tag">Concepto de estación modular experimental.</p><p class="desc">Web de concepto de producto: una estación de investigación de sobremesa que une computación, adquisición de señales y experimentación en un chasis modular.</p>
+  <p class="meta">Actualizado el 24 oct 2026</p>
+  <div class="btns"><a class="btn primary" href="https://ardu01.github.io/nexus-01-web/" target="_blank" rel="noopener">Ver web</a><a class="btn" href="https://github.com/ardu01/nexus-01-web" target="_blank" rel="noopener">Repositorio</a></div>
+</article><article class="card reveal" id="inventario-taller">
+  
+  <h3>Inventario del taller</h3>
+  <p class="tag">El material real del taller, para diseñar con lo que ya hay.</p><p class="desc">Inventario de tornillería y electrónica que consultan Orbit y el resto de diseños antes de pedir piezas.</p>
+  <p class="meta">Actualizado el 22 oct 2026</p>
+  <div class="btns"><span class="privlabel">Repositorio privado</span></div>
+</article></div></section>
+
+</main>
+<footer>© 2026 Miguel Rodríguez Saiz · ArduSolutions</footer>
+<script>
+(()=>{const els=document.querySelectorAll('.reveal');
+if(!('IntersectionObserver' in window)){els.forEach(e=>e.classList.add('in'));return}
+const io=new IntersectionObserver(es=>es.forEach(x=>{if(x.isIntersecting){x.target.classList.add('in');io.unobserve(x.target)}}),{rootMargin:'0px 0px -8% 0px'});
+els.forEach(e=>io.observe(e));})();
+</script>
+</body>
+</html>
