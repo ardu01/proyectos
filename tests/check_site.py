@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Comprueba el catálogo y la landing de Zalmann OS.
+"""Comprueba el catálogo. La web de Zalmann OS vive en ardu01/zalmann-os-web.
 
 No arranca navegador. Los enlaces internos se resuelven en disco.
 """
@@ -13,7 +13,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 INDEX = ROOT / "index.html"
-LANDING = ROOT / "zalmann-os" / "index.html"
+WEB = "https://ardu01.github.io/zalmann-os-web/"
 
 ARTICLE_IDS = [
     "sopa-ia",
@@ -58,7 +58,7 @@ REQUIRED_HREFS = [
     "#secundario",
     "#terminado",
     "#aparcado",
-    "zalmann-os/",
+    "https://ardu01.github.io/zalmann-os-web/",
 ]
 
 KEPT_SNIPPETS = [
@@ -138,7 +138,6 @@ class SiteTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         cls.index_text, cls.index = parse(INDEX)
-        cls.land_text, cls.land = parse(LANDING)
 
     def test_catalog_counts_and_order(self) -> None:
         ids = re.findall(r'<article class="card reveal" id="([^"]+)">', self.index_text)
@@ -168,12 +167,17 @@ class SiteTests(unittest.TestCase):
         self.assertIn("Dock magnificador renderizado por software.", card)
         self.assertIn("Python", card)
         self.assertIn("En desarrollo", card)
-        self.assertIn('href="zalmann-os/"', card)
+        self.assertIn(
+            f'href="{WEB}" target="_blank" rel="noopener"',
+            card,
+        )
+        self.assertNotIn('href="zalmann-os/"', self.index_text)
         self.assertIn("Repositorio privado", card)
         self.assertNotIn(PRIVATE_REPO, card)
+        self.assertFalse((ROOT / "zalmann-os").exists())
 
     def test_internal_links_resolve(self) -> None:
-        for page, parser in ((INDEX, self.index), (LANDING, self.land)):
+        for page, parser in ((INDEX, self.index),):
             for href in parser.hrefs:
                 resolved = resolve(page, href)
                 if resolved is None:
@@ -184,45 +188,14 @@ class SiteTests(unittest.TestCase):
                     text = target.read_text(encoding="utf-8")
                     self.assertRegex(text, rf'id="{re.escape(frag)}"')
 
-    def test_landing_is_accessible_document(self) -> None:
-        self.assertEqual(self.land.lang, "es")
-        self.assertEqual(self.land.h1, 1)
-        self.assertTrue(self.land.skip)
-        self.assertTrue(self.land.main)
-        self.assertIn('name="viewport" content="width=device-width', self.land_text)
-        self.assertIn("prefers-color-scheme:dark", self.land_text)
-        self.assertIn("prefers-color-scheme: light", self.land_text)
-        self.assertIn("prefers-reduced-motion:reduce", self.land_text)
-        self.assertIn(":focus-visible", self.land_text)
-        self.assertIn("Saltar al contenido", self.land_text)
-        self.assertIn("<main", self.land_text)
-        for needed in (
-            "Ubuntu",
-            "XFCE",
-            "Tahoe",
-            "Python",
-            "En desarrollo",
-            "renderizado por software",
-            "repositorio privado",
-            "SOPA IA",
-            "Jerry",
-        ):
-            self.assertIn(needed, self.land_text)
-        self.assertEqual(self.land.images, 0)
-        self.assertNotIn("<img", self.land_text.lower())
-        self.assertNotIn("download=", self.land_text.lower())
-
     def test_no_private_repo_link_secrets_or_invented_claims(self) -> None:
-        pages = [INDEX, LANDING, ROOT / "README.md"]
+        pages = [INDEX, ROOT / "README.md"]
         for page in pages:
             text = page.read_text(encoding="utf-8")
             self.assertNotIn(PRIVATE_REPO, text, page.name)
             for pattern in SECRET_PATTERNS:
                 self.assertIsNone(pattern.search(text), f"{pattern.pattern} en {page.name}")
-        for href in self.land.hrefs:
-            self.assertIsNone(re.search(r"\.(iso|deb|appimage|zip|exe|dmg|whl)(?:$|\?)", href, re.I))
-        for banned in ("macOS", "Raspberry", "rendimiento", "requisitos", "captura", "screenshot"):
-            self.assertNotIn(banned, self.land_text)
+            self.assertIsNone(re.search(r"github\.com/ardu01/zalmann-os(?!-web)", text), page.name)
 
 
 if __name__ == "__main__":

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
- * Recorre el catálogo y la landing con Chrome headless.
- * Comprueba desbordamiento, modo claro/oscuro, móvil y el enlace interno.
+ * Recorre el catálogo con Chrome headless.
+ * La landing está en ardu01.github.io/zalmann-os-web y aquí solo se comprueba el enlace.
  */
 import { spawn } from "node:child_process";
 import { mkdirSync, writeFileSync } from "node:fs";
@@ -166,7 +166,6 @@ try {
   await settle(cdp);
 
   const wide = [[1280, 900], [1440, 900]];
-  const all = [[320, 700], [390, 844], [768, 1024], ...wide];
   for (const scheme of ["light", "dark"]) {
     for (const [w, h] of wide) {
       await setView(cdp, w, h, scheme, false);
@@ -198,70 +197,23 @@ try {
     returnByValue: true,
   });
   const info = indexInfo.result.value;
-  check(info.priority === 3, "la sección Prioritario no tiene 3 fichas");
-  check(info.href === "zalmann-os/", "la ficha no enlaza zalmann-os/");
-  check(info.text.includes("Zalmann OS"), "no se ve el título de la ficha");
-  check(info.revealed, "la ficha no entra en pantalla");
-
-  await cdp.send("Runtime.evaluate", {
-    expression: `document.querySelector("#zalmann-os a.btn.primary").click()`,
-  });
-  let href = "";
-  for (let i = 0; i < 25; i++) {
-    await delay(200);
-    try {
-      const current = await cdp.send("Runtime.evaluate", { expression: "location.href", returnByValue: true });
-      href = current.result.value || "";
-      if (href.includes("/zalmann-os/")) break;
-    } catch { /* el contexto se recrea al navegar */ }
-  }
-  await setView(cdp, 1440, 1000, "light", false);
-  let landed = await metrics(cdp);
-  landed.url = href || landed.url;
-  check(landed.url.includes("/zalmann-os/"), "el botón Ver web no abre la landing: " + landed.url);
-  check(landed.h1 === 1, "la landing no tiene un único h1");
-
-  const landingShots = [];
-  for (const scheme of ["light", "dark"]) {
-    for (const [w, h] of all) {
-      await setView(cdp, w, h, scheme, w < 700);
-      const m = await metrics(cdp);
-      check(!m.overflow, `landing desborda en ${scheme} ${w}px (${m.scrollWidth}/${m.clientWidth})`);
-      check(m.small.length === 0, `controles pequeños en ${scheme} ${w}: ${m.small.join(", ")}`);
-      check(m.h1 === 1, "h1 distinto de 1 tras cambiar de vista");
-    }
-  }
-
-  await setView(cdp, 1440, 1000, "light", false);
-  await cdp.send("Runtime.evaluate", { expression: "scrollTo(0,0)" });
-  landingShots.push(await shot(cdp, "landing-desktop-light", true));
-  const light = await metrics(cdp);
-
-  await setView(cdp, 390, 844, "light", true);
-  await cdp.send("Runtime.evaluate", { expression: "scrollTo(0,0)" });
-  landingShots.push(await shot(cdp, "landing-mobile-light", true));
-
-  await setView(cdp, 1440, 1000, "dark", false);
-  await cdp.send("Runtime.evaluate", { expression: "scrollTo(0,0)" });
-  landingShots.push(await shot(cdp, "landing-desktop-dark", true));
-  const dark = await metrics(cdp);
-  check(light.bg !== dark.bg, `el fondo no cambia con el esquema (${light.bg} / ${dark.bg})`);
-
-  await setView(cdp, 390, 844, "dark", true);
-  await cdp.send("Runtime.evaluate", { expression: "scrollTo(0,0)" });
-  landingShots.push(await shot(cdp, "landing-mobile-dark", true));
-
-  await cdp.send("Runtime.evaluate", {
-    expression: `document.querySelector("a.skip").focus(); document.querySelector("a.skip").click();`,
-  });
-  const focus = await cdp.send("Runtime.evaluate", {
-    expression: `document.activeElement && document.activeElement.id`,
+  const linkInfo = await cdp.send("Runtime.evaluate", {
+    expression: `(() => {
+      const link = document.querySelector("#zalmann-os a.btn.primary");
+      return { target: link.getAttribute("target"), rel: link.getAttribute("rel") };
+    })()`,
     returnByValue: true,
   });
-  check(focus.result.value === "contenido", "el salto al contenido no mueve el foco");
+  const link = linkInfo.result.value;
+  check(info.priority === 3, "la sección Prioritario no tiene 3 fichas");
+  check(info.href === "https://ardu01.github.io/zalmann-os-web/", "la ficha no enlaza la web independiente");
+  check(link.target === "_blank" && link.rel === "noopener", "Ver web no abre como enlace externo");
+  check(info.text.includes("Zalmann OS"), "no se ve el título de la ficha");
+  check(info.revealed, "la ficha no entra en pantalla");
+  check(!info.text.includes("github.com"), "la ficha no debe mostrar un enlace a GitHub");
 
   ws.close();
-  const report = { ok: failures.length === 0, failures, shots: [indexShot, ...landingShots], lightBg: light.bg, darkBg: dark.bg };
+  const report = { ok: failures.length === 0, failures, shots: [indexShot] };
   writeFileSync(`${OUT}/report.json`, JSON.stringify(report, null, 2));
   console.log(JSON.stringify(report, null, 2));
   stop();
