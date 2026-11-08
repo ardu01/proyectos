@@ -177,11 +177,16 @@ class SiteTests(unittest.TestCase):
         self.assertEqual(finished.count('class="pill ok">Terminado / mantener'), 12)
         tray = self.index_text.split('id="bandeja-zalman-r1"', 1)[1].split("</article>", 1)[0]
         self.assertIn("Bandeja para disco duro de 3,5 pulgadas diseñada para la torre Zalman R1.", tray)
-        self.assertIn("Archivos de diseño pendientes de publicación.", tray)
+        self.assertIn("STL disponible. Archivo editable pendiente de publicación.", tray)
+        self.assertNotIn("Archivos de diseño pendientes de publicación.", tray)
         self.assertNotIn("SLDPRT", tray)
-        self.assertNotIn("STL", tray)
+        self.assertNotIn("SolidWorks", tray)
+        self.assertIn(
+            'href="https://raw.githubusercontent.com/ardu01/zalman-r1-bandeja-hdd-3.5/main/models/DISCO35ZALMANv2.STL"',
+            tray,
+        )
+        self.assertIn(">Descargar STL</a>", tray)
         self.assertIn('href="https://github.com/ardu01/zalman-r1-bandeja-hdd-3.5"', tray)
-        self.assertNotIn("Descargar", tray)
         self.assertNotIn("zalmann-os", tray)
         for absent in ("ArduSCADA", "estudio-ruso", "golf-lab", "Eon", "NEXUS", "Aura One", "ArduFiles", "inventario-taller"):
             self.assertNotIn(absent, self.index_text)
