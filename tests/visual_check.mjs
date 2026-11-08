@@ -323,8 +323,8 @@ try {
     returnByValue: true,
   });
   const counts = census.result.value;
-  check(counts.total === "21", "el total no es 21: " + counts.total);
-  check(counts.priority === 3 && counts.secondary === 3 && counts.done === 12 && counts.parked === 3, "los grupos no cuadran: " + JSON.stringify(counts));
+  check(counts.total === "22", "el total no es 22: " + counts.total);
+  check(counts.priority === 3 && counts.secondary === 4 && counts.done === 12 && counts.parked === 3, "los grupos no cuadran: " + JSON.stringify(counts));
 
   function contrastOf(fg, bg) {
     const lin = (v) => {
@@ -373,7 +373,7 @@ try {
   await delay(200);
   const lightLabels = await labelReport();
   check(lightLabels.done.length === 12, "en claro no hay 12 etiquetas verdes");
-  check(lightLabels.dev.length === 4, "en claro no hay 4 etiquetas En desarrollo");
+  check(lightLabels.dev.length === 5, "en claro no hay 5 etiquetas En desarrollo");
   check(lightLabels.pause.startsWith("En pausa") && lightLabels.nav === "En pausa", "el texto visible no es En pausa");
   for (const pill of lightLabels.done) {
     check(pill.text === "Terminado / mantener", "etiqueta verde distinta: " + pill.text);
@@ -392,11 +392,14 @@ try {
   await cdp.send("Runtime.evaluate", { expression: `document.querySelector("#cad").scrollIntoView({block:"center"})` });
   await delay(150);
   const lightCad = await shot(cdp, "etiquetas-sopacad-claro");
+  await cdp.send("Runtime.evaluate", { expression: `document.querySelector("#rea-studio").scrollIntoView({block:"center"})` });
+  await delay(200);
+  const lightStudio = await shot(cdp, "ficha-rea-studio-claro");
   await setView(cdp, 1440, 900, "dark", false);
   await cdp.send("Runtime.evaluate", { expression: `document.querySelector("#terminado").scrollIntoView({block:"start"})` });
   await delay(200);
   const darkLabels = await labelReport();
-  check(darkLabels.done.length === 12 && darkLabels.dev.length === 4, "en oscuro faltan etiquetas");
+  check(darkLabels.done.length === 12 && darkLabels.dev.length === 5, "en oscuro faltan etiquetas");
   for (const pill of darkLabels.done) {
     check(contrastOf(pill.color, pill.bg) >= 4.5, "contraste verde oscuro " + contrastOf(pill.color, pill.bg).toFixed(2));
     check(pill.color.g > pill.color.r, "en oscuro la etiqueta de terminado no es verde");
@@ -513,7 +516,7 @@ try {
     phone,
     counts,
     theme: { light: lightM.bg, dark: darkM.bg },
-    shots: [indexShot, countersShot, darkShot, sopaShot, phoneShot, lightDone, lightDev, lightCad, darkDone, darkDev, ...pageShots],
+    shots: [indexShot, countersShot, darkShot, sopaShot, phoneShot, lightDone, lightDev, lightCad, lightStudio, darkDone, darkDev, ...pageShots],
   };
   writeFileSync(`${OUT}/report.json`, JSON.stringify(report, null, 2));
   console.log(JSON.stringify(report, null, 2));
