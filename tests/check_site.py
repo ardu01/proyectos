@@ -33,6 +33,7 @@ ARTICLE_IDS = [
     "rea-codex",
     "red-casa",
     "storage-hub",
+    "bandeja-zalman-r1",
     "motor-ligero",
     "axiom-lab",
     "android-deck",
@@ -63,6 +64,7 @@ REQUIRED_HREFS = [
     "#terminado",
     "#aparcado",
     "https://ardu01.github.io/zalmann-os-web/",
+    "https://github.com/ardu01/zalman-r1-bandeja-hdd-3.5",
     "red-casa/",
     "storage-hub/",
 ]
@@ -148,11 +150,11 @@ class SiteTests(unittest.TestCase):
     def test_catalog_counts_and_order(self) -> None:
         ids = re.findall(r'<article class="card reveal" id="([^"]+)">', self.index_text)
         self.assertEqual(ids, ARTICLE_IDS)
-        self.assertEqual(len(ids), 20)
-        self.assertIn(">20</b>proyectos", self.index_text)
+        self.assertEqual(len(ids), 21)
+        self.assertIn(">21</b>proyectos", self.index_text)
         self.assertIn(">3</b><span class=\"dot hi\"></span>prioritarios", self.index_text)
         self.assertIn(">3</b><span class=\"dot dev\"></span>secundarios", self.index_text)
-        self.assertIn(">11</b><span class=\"dot ok\"></span>terminados", self.index_text)
+        self.assertIn(">12</b><span class=\"dot ok\"></span>terminados", self.index_text)
         self.assertIn(">3</b><span class=\"dot idea\"></span>en pausa", self.index_text)
         self.assertNotIn("aparcados", self.index_text)
         self.assertNotIn(">Aparcado<", self.index_text)
@@ -168,10 +170,19 @@ class SiteTests(unittest.TestCase):
         self.assertNotIn("red-casa", secondary)
         self.assertNotIn("storage-hub", secondary)
         finished = self.index_text.split('id="terminado"', 1)[1].split('id="aparcado"', 1)[0]
-        self.assertIn('<span class="count">11</span>', finished)
+        self.assertIn('<span class="count">12</span>', finished)
         self.assertLess(finished.index("rea-codex"), finished.index("red-casa"))
         self.assertLess(finished.index("red-casa"), finished.index("storage-hub"))
-        self.assertEqual(finished.count('class="pill ok">Terminado / mantener'), 11)
+        self.assertLess(finished.index("storage-hub"), finished.index("bandeja-zalman-r1"))
+        self.assertEqual(finished.count('class="pill ok">Terminado / mantener'), 12)
+        tray = self.index_text.split('id="bandeja-zalman-r1"', 1)[1].split("</article>", 1)[0]
+        self.assertIn("Bandeja para disco duro de 3,5 pulgadas diseñada para la torre Zalman R1.", tray)
+        self.assertIn("los archivos de diseño no están subidos", tray)
+        self.assertIn('href="https://github.com/ardu01/zalman-r1-bandeja-hdd-3.5"', tray)
+        self.assertNotIn("Descargar", tray)
+        self.assertNotIn("zalmann-os", tray)
+        for absent in ("ArduSCADA", "estudio-ruso", "golf-lab", "Eon", "NEXUS", "Aura One", "ArduFiles", "inventario-taller"):
+            self.assertNotIn(absent, self.index_text)
         for name in ("avatar-engine", "os-apple", "motor-ligero", "axiom-lab", "android-deck"):
             card = self.index_text.split(f'id="{name}"', 1)[1].split("</article>", 1)[0]
             self.assertNotIn('class="pill ok"', card, name)
