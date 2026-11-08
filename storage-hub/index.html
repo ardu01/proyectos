@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1124, viewport-fit=cover">
+<meta name="format-detection" content="telephone=no">
+<meta name="theme-color" content="#fbfbfd" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+<title>Storage Hub · Proyectos de Miguel</title>
+<meta name="description" content="Storage Hub, panel para los archivos compartidos de casa, en desarrollo. Capacidades según la documentación del proyecto.">
+<meta name="color-scheme" content="light dark">
+<style>
+:root{--bg:#fbfbfd;--bg2:#f5f5f7;--card:#fff;--fg:#1d1d1f;--fg2:#6e6e73;--line:rgba(0,0,0,.08);--accent:#0071e3;--nav:rgba(251,251,253,.72);--shadow:0 2px 6px rgba(0,0,0,.04),0 12px 32px rgba(0,0,0,.06)}
+@media (prefers-color-scheme:dark){:root{--bg:#000;--bg2:#0b0b0d;--card:#1c1c1e;--fg:#f5f5f7;--fg2:#a1a1a6;--line:rgba(255,255,255,.1);--accent:#2997ff;--nav:rgba(22,22,23,.72);--shadow:0 0 0 1px rgba(255,255,255,.06)}}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:64px;-webkit-text-size-adjust:100%;text-size-adjust:100%;min-width:1124px;background:var(--bg)}
+body{min-width:1124px;overflow-x:hidden;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Helvetica Neue",Helvetica,Arial,sans-serif;background:var(--bg);color:var(--fg);-webkit-font-smoothing:antialiased;line-height:1.47;letter-spacing:-.01em}
+a{color:inherit;text-decoration:none}
+nav{position:-webkit-sticky;position:sticky;top:0;padding-top:env(safe-area-inset-top);z-index:10;backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);background:var(--nav);border-bottom:1px solid var(--line)}
+.navin{max-width:1080px;margin:0 auto;display:flex;align-items:center;gap:28px;height:52px;padding:0 22px;padding-left:max(22px,env(safe-area-inset-left));padding-right:max(22px,env(safe-area-inset-right));overflow-x:auto;scrollbar-width:none}
+.navin::-webkit-scrollbar{display:none}
+.brand{font-weight:600;font-size:17px;white-space:nowrap;margin-right:auto;display:inline-flex;align-items:center;min-height:32px}
+.navin a:not(.brand){font-size:12.5px;color:var(--fg2);white-space:nowrap;transition:color .2s;display:inline-flex;align-items:center;min-height:32px}
+.navin a:not(.brand):hover{color:var(--fg)}
+.skip{position:absolute;left:max(16px,env(safe-area-inset-left));top:8px;transform:translateY(-160%);background:var(--accent);color:#fff;padding:10px 16px;border-radius:999px;z-index:30;font-size:14px;font-weight:600}
+.skip:focus{transform:none}
+a:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+header{padding:88px 22px 28px;background:linear-gradient(180deg,var(--bg) 0%,var(--bg2) 100%)}
+.wrap{max-width:1080px;margin:0 auto}
+.eyebrow{font-size:17px;font-weight:600;color:var(--accent);margin-bottom:10px}
+h1{font-size:clamp(44px,7vw,72px);font-weight:700;letter-spacing:-.035em;line-height:1.05;background:linear-gradient(90deg,#1d1d1f,#5e5ce6 55%,#0071e3);-webkit-background-clip:text;background-clip:text;color:transparent}
+@media (prefers-color-scheme:dark){h1{background:linear-gradient(90deg,#f5f5f7,#bf5af2 55%,#2997ff);-webkit-background-clip:text;background-clip:text}}
+.sub{font-size:clamp(19px,2.2vw,24px);color:var(--fg2);max-width:760px;margin:18px 0 0;font-weight:400}
+main{max-width:1080px;margin:0 auto;padding:0 22px 8px}
+section{padding:56px 0 8px}
+h2{font-size:clamp(28px,3.6vw,40px);font-weight:700;letter-spacing:-.03em;margin-bottom:18px}
+.prose{max-width:760px;font-size:17px;color:var(--fg2)}
+.prose p+p{margin-top:14px}
+.prose strong{color:var(--fg);font-weight:600}
+.feats{display:grid;grid-template-columns:1fr 1fr;gap:16px;list-style:none}
+.feats li{background:var(--card);border-radius:18px;padding:22px 22px 20px;box-shadow:var(--shadow)}
+.feats h3{font-size:19px;font-weight:600;letter-spacing:-.02em;margin-bottom:6px}
+.feats p{font-size:15px;color:var(--fg2)}
+.pill{display:inline-block;font-size:12px;font-weight:600;padding:4px 10px;border-radius:999px;background:rgba(255,149,0,.15);color:#c93400;margin-bottom:14px}
+@media (prefers-color-scheme:dark){.pill{color:#ff9f0a}}
+.links{display:flex;gap:10px;flex-wrap:wrap;margin-top:28px}
+.btn{font-size:14px;padding:8px 16px;border-radius:999px;border:1px solid var(--line);color:var(--accent);display:inline-flex;align-items:center;min-height:32px}
+.btn:hover{background:var(--bg2)}
+.btn.primary{background:var(--accent);color:#fff;border-color:transparent}
+footer{text-align:center;color:var(--fg2);font-size:12px;padding:72px 22px 48px;padding-bottom:calc(48px + env(safe-area-inset-bottom));border-top:1px solid var(--line);margin-top:72px}
+footer a{color:var(--accent)}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+@media (forced-colors:active){h1{background:none;color:CanvasText;-webkit-text-fill-color:CanvasText}}
+</style>
+</head>
+<body>
+<a class="skip" href="#contenido">Saltar al contenido</a>
+<nav aria-label="Secciones de Storage Hub"><div class="navin"><a class="brand" href="../#storage-hub">Proyectos</a><a href="#que-es">Qué es</a><a href="#capacidades">Capacidades</a><a href="#acceso">Acceso</a><a href="#pruebas">Pruebas documentadas</a><a href="#limites">Límites</a></div></nav>
+<header id="inicio">
+  <div class="wrap">
+    <p class="pill">En desarrollo</p>
+    <p class="eyebrow">Archivos de casa</p>
+    <h1>Storage Hub</h1>
+    <p class="sub">Panel para ver los discos de los ordenadores de casa, recorrer las carpetas compartidas, buscar archivos por nombre y copiarlos o moverlos entre equipos. El texto está tomado de la documentación del proyecto, consultada el 8 de noviembre de 2026. Esta web no ha ejecutado el programa.</p>
+  </div>
+</header>
+<main id="contenido">
+<section id="que-es" aria-labelledby="que-es-titulo">
+  <h2 id="que-es-titulo">Qué es</h2>
+  <div class="prose">
+    <p>La documentación lo presenta sin cuenta y sin telemetría, y sin un servicio en la nube para ver, buscar o copiar archivos. El móvil hace de mando: sube y descarga archivos, y no es un disco.</p>
+    <p>La documentación de estado indica la versión 4.1.0. Describe un uso local y no lo da por instalado en los equipos de casa: ese paso figura como manual.</p>
+    <p>Es un único programa en Go, que hace de agente o de hub. La interfaz, en React, Tailwind y shadcn, se construye con Vite y va incluida en el programa, así que ejecutarlo no pide Node. Sale para Windows amd64, Linux amd64 y Linux arm64, incluida la Raspberry Pi. En Windows, la documentación describe un arranque con un script. En Linux, un servicio de usuario.</p>
+  </div>
+</section>
+<section id="capacidades" aria-labelledby="capacidades-titulo">
+  <h2 id="capacidades-titulo">Capacidades documentadas</h2>
+  <ul class="feats">
+    <li>
+      <h3>Ordenadores</h3>
+      <p>Una ficha por ordenador, con sus discos y su capacidad.</p>
+    </li>
+    <li>
+      <h3>Explorador</h3>
+      <p>La estructura del Explorador de Windows 11 y el aspecto de macOS. Claro u oscuro según el sistema.</p>
+    </li>
+    <li>
+      <h3>Búsqueda</h3>
+      <p>Búsqueda por nombre dentro de las carpetas compartidas.</p>
+    </li>
+    <li>
+      <h3>Copia</h3>
+      <p>Copia de archivos entre equipos en flujo, sin guardarlos en un punto intermedio.</p>
+    </li>
+    <li>
+      <h3>Movimiento</h3>
+      <p>Primero copia, luego comprueba tamaño y SHA-256, y solo entonces borra el original. Si la comprobación falla, el original no se toca.</p>
+    </li>
+    <li>
+      <h3>Salud de los discos</h3>
+      <p>SMART, según la documentación: temperatura, horas, sectores y estado de atención. En Linux hace falta un componente opcional aparte.</p>
+    </li>
+    <li>
+      <h3>iPhone</h3>
+      <p>App en la pantalla de inicio, dentro de la red local. Sirve para subir y descargar. No es un nodo de almacenamiento.</p>
+    </li>
+  </ul>
+</section>
+<section id="acceso" aria-labelledby="acceso-titulo">
+  <h2 id="acceso-titulo">Acceso, según la documentación</h2>
+  <div class="prose">
+    <p>Solo la red local, con direcciones privadas o el propio equipo. Un token por equipo. Las carpetas compartidas nacen en solo lectura. La escritura y el borrado se activan aparte.</p>
+    <p>Rechaza las rutas que intentan salir de la carpeta compartida. No borra carpetas. No ejecuta órdenes ni se actualiza solo. Esto es lo que describe la documentación, no una garantía añadida por esta web.</p>
+  </div>
+</section>
+<section id="pruebas" aria-labelledby="pruebas-titulo">
+  <h2 id="pruebas-titulo">Pruebas que describe la documentación</h2>
+  <div class="prose">
+    <p>La documentación describe pruebas automáticas de rutas, de token, del filtro de red local, de la verificación de copias y del respaldo de la configuración. También describe una prueba con dos agentes y el hub moviendo un archivo, y otra en la que el destino informa mal el tamaño y el original no se borra. Menciona una autoprueba sin red, con seis comprobaciones, y un flujo de integración continua.</p>
+    <p>Esta web no ha ejecutado esas pruebas ni ha comprobado si esa integración ha corrido o con qué resultado.</p>
+  </div>
+</section>
+<section id="limites" aria-labelledby="limites-titulo">
+  <h2 id="limites-titulo">Límites documentados</h2>
+  <div class="prose">
+    <p>El iPhone no es un nodo. Sin HTTPS no hay modo sin conexión. Se copia un archivo cada vez, no una carpeta entera. La lista de transferencias se pierde al reiniciar el hub. Los archivos ya copiados se quedan.</p>
+    <p>No admite IPv6. La búsqueda en discos grandes es lenta. Las descargas muy grandes al iPhone pueden fallar por la memoria de Safari.</p>
+  </div>
+  <div class="links">
+    <a class="btn primary" href="../#storage-hub">Volver a la ficha</a>
+    <a class="btn" href="../red-casa/">Red Casa</a>
+  </div>
+</section>
+</main>
+<footer>© 2026 Miguel Rodríguez Saiz · ArduSolutions · <a href="../#inicio">Todos los proyectos</a></footer>
+</body>
+</html>

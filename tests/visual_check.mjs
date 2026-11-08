@@ -310,13 +310,101 @@ try {
   );
   const phoneShot = await shot(cdp, "index-iphone-light");
 
+  const census = await cdp.send("Runtime.evaluate", {
+    expression: `(() => ({
+      total: document.querySelector(".stat.total b").textContent,
+      priority: document.querySelectorAll("#prioritario article").length,
+      secondary: document.querySelectorAll("#secundario article").length,
+      done: document.querySelectorAll("#terminado article").length,
+      parked: document.querySelectorAll("#aparcado article").length,
+      red: document.querySelector("#red-casa a.btn.primary").getAttribute("href"),
+      hub: document.querySelector("#storage-hub a.btn.primary").getAttribute("href"),
+    }))()`,
+    returnByValue: true,
+  });
+  const counts = census.result.value;
+  check(counts.total === "20", "el total no es 20: " + counts.total);
+  check(counts.priority === 3 && counts.secondary === 5 && counts.done === 9 && counts.parked === 3, "los grupos no cuadran: " + JSON.stringify(counts));
+  check(counts.red === "red-casa/" && counts.hub === "storage-hub/", "las fichas nuevas no enlazan sus páginas");
+
+  const pageShots = [];
+  for (const spec of [
+    { path: "red-casa/", title: "Red Casa", light: "vista-web-red-casa-claro", darkShot: "vista-web-red-casa-oscuro", phoneShot: "" },
+    { path: "storage-hub/", title: "Storage Hub", light: "vista-web-storage-hub-claro", darkShot: "", phoneShot: "vista-web-storage-hub-iphone" },
+  ]) {
+    const opened = await openPage(`http://127.0.0.1:${WEB}/${spec.path}`);
+    await settle(opened.cdp);
+    await setView(opened.cdp, 1440, 900, "light", false);
+    const info = await opened.cdp.send("Runtime.evaluate", {
+      expression: `(() => {
+        const doc = document.documentElement;
+        const back = document.querySelector("a.btn.primary");
+        return {
+          h1: document.querySelector("h1").textContent,
+          imgs: document.images.length,
+          github: document.body.innerText.toLowerCase().includes("github.com"),
+          executed: document.body.innerText.includes("Esta web no ha ejecutado el programa."),
+          overflow: doc.scrollWidth > doc.clientWidth + 1,
+          bg: getComputedStyle(document.body).backgroundColor,
+          back: back ? back.getAttribute("href") : "",
+        };
+      })()`,
+      returnByValue: true,
+    });
+    const page = info.result.value;
+    check(page.h1 === spec.title, `${spec.path} título inesperado: ${page.h1}`);
+    check(page.imgs === 0, `${spec.path} incluye imágenes`);
+    check(!page.github, `${spec.path} muestra un enlace de GitHub`);
+    check(page.executed, `${spec.path} no dice que esta web no ha ejecutado el programa`);
+    check(!page.overflow, `${spec.path} desborda en claro`);
+    check(page.bg === "rgb(251, 251, 253)", `${spec.path} fondo claro: ${page.bg}`);
+    check(page.back.startsWith("../#"), `${spec.path} no vuelve a su ficha: ${page.back}`);
+    pageShots.push(await shot(opened.cdp, spec.light));
+    await setView(opened.cdp, 1440, 900, "dark", false);
+    const darkPage = await opened.cdp.send("Runtime.evaluate", {
+      expression: `(() => {
+        const doc = document.documentElement;
+        return {
+          bg: getComputedStyle(document.body).backgroundColor,
+          overflow: doc.scrollWidth > doc.clientWidth + 1,
+        };
+      })()`,
+      returnByValue: true,
+    });
+    check(darkPage.result.value.bg === "rgb(0, 0, 0)", `${spec.path} fondo oscuro: ${darkPage.result.value.bg}`);
+    check(!darkPage.result.value.overflow, `${spec.path} desborda en oscuro`);
+    if (spec.darkShot) pageShots.push(await shot(opened.cdp, spec.darkShot));
+    await opened.cdp.send("Emulation.setDeviceMetricsOverride", {
+      width: 390, height: 844, deviceScaleFactor: 3, mobile: true,
+    });
+    await opened.cdp.send("Runtime.evaluate", { expression: "window.scrollTo(0, 0)" });
+    await delay(200);
+    const phonePage = await opened.cdp.send("Runtime.evaluate", {
+      expression: `(() => {
+        const doc = document.documentElement;
+        return {
+          clientWidth: doc.clientWidth,
+          scrollWidth: doc.scrollWidth,
+          scale: window.visualViewport ? window.visualViewport.scale : null,
+        };
+      })()`,
+      returnByValue: true,
+    });
+    const phoneView = phonePage.result.value;
+    check(phoneView.scrollWidth <= phoneView.clientWidth + 1, `${spec.path} desborda en el iPhone`);
+    check(phoneView.clientWidth >= 1100 && phoneView.scale < 0.6, `${spec.path} no escala el lienzo: ${JSON.stringify(phoneView)}`);
+    if (spec.phoneShot) pageShots.push(await shot(opened.cdp, spec.phoneShot));
+    opened.ws.close();
+  }
+
   ws.close();
   const report = {
     ok: failures.length === 0,
     failures,
     phone,
+    counts,
     theme: { light: lightM.bg, dark: darkM.bg },
-    shots: [indexShot, countersShot, darkShot, sopaShot, phoneShot],
+    shots: [indexShot, countersShot, darkShot, sopaShot, phoneShot, ...pageShots],
   };
   writeFileSync(`${OUT}/report.json`, JSON.stringify(report, null, 2));
   console.log(JSON.stringify(report, null, 2));

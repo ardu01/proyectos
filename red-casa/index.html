@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1124, viewport-fit=cover">
+<meta name="format-detection" content="telephone=no">
+<meta name="theme-color" content="#fbfbfd" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+<title>Red Casa · Proyectos de Miguel</title>
+<meta name="description" content="Red Casa, panel web para la red doméstica, en desarrollo. Capacidades según la documentación del proyecto.">
+<meta name="color-scheme" content="light dark">
+<style>
+:root{--bg:#fbfbfd;--bg2:#f5f5f7;--card:#fff;--fg:#1d1d1f;--fg2:#6e6e73;--line:rgba(0,0,0,.08);--accent:#0071e3;--nav:rgba(251,251,253,.72);--shadow:0 2px 6px rgba(0,0,0,.04),0 12px 32px rgba(0,0,0,.06)}
+@media (prefers-color-scheme:dark){:root{--bg:#000;--bg2:#0b0b0d;--card:#1c1c1e;--fg:#f5f5f7;--fg2:#a1a1a6;--line:rgba(255,255,255,.1);--accent:#2997ff;--nav:rgba(22,22,23,.72);--shadow:0 0 0 1px rgba(255,255,255,.06)}}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:64px;-webkit-text-size-adjust:100%;text-size-adjust:100%;min-width:1124px;background:var(--bg)}
+body{min-width:1124px;overflow-x:hidden;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Helvetica Neue",Helvetica,Arial,sans-serif;background:var(--bg);color:var(--fg);-webkit-font-smoothing:antialiased;line-height:1.47;letter-spacing:-.01em}
+a{color:inherit;text-decoration:none}
+nav{position:-webkit-sticky;position:sticky;top:0;padding-top:env(safe-area-inset-top);z-index:10;backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);background:var(--nav);border-bottom:1px solid var(--line)}
+.navin{max-width:1080px;margin:0 auto;display:flex;align-items:center;gap:28px;height:52px;padding:0 22px;padding-left:max(22px,env(safe-area-inset-left));padding-right:max(22px,env(safe-area-inset-right));overflow-x:auto;scrollbar-width:none}
+.navin::-webkit-scrollbar{display:none}
+.brand{font-weight:600;font-size:17px;white-space:nowrap;margin-right:auto;display:inline-flex;align-items:center;min-height:32px}
+.navin a:not(.brand){font-size:12.5px;color:var(--fg2);white-space:nowrap;transition:color .2s;display:inline-flex;align-items:center;min-height:32px}
+.navin a:not(.brand):hover{color:var(--fg)}
+.skip{position:absolute;left:max(16px,env(safe-area-inset-left));top:8px;transform:translateY(-160%);background:var(--accent);color:#fff;padding:10px 16px;border-radius:999px;z-index:30;font-size:14px;font-weight:600}
+.skip:focus{transform:none}
+a:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+header{padding:88px 22px 28px;background:linear-gradient(180deg,var(--bg) 0%,var(--bg2) 100%)}
+.wrap{max-width:1080px;margin:0 auto}
+.eyebrow{font-size:17px;font-weight:600;color:var(--accent);margin-bottom:10px}
+h1{font-size:clamp(44px,7vw,72px);font-weight:700;letter-spacing:-.035em;line-height:1.05;background:linear-gradient(90deg,#1d1d1f,#5e5ce6 55%,#0071e3);-webkit-background-clip:text;background-clip:text;color:transparent}
+@media (prefers-color-scheme:dark){h1{background:linear-gradient(90deg,#f5f5f7,#bf5af2 55%,#2997ff);-webkit-background-clip:text;background-clip:text}}
+.sub{font-size:clamp(19px,2.2vw,24px);color:var(--fg2);max-width:760px;margin:18px 0 0;font-weight:400}
+main{max-width:1080px;margin:0 auto;padding:0 22px 8px}
+section{padding:56px 0 8px}
+h2{font-size:clamp(28px,3.6vw,40px);font-weight:700;letter-spacing:-.03em;margin-bottom:18px}
+.prose{max-width:760px;font-size:17px;color:var(--fg2)}
+.prose p+p{margin-top:14px}
+.prose strong{color:var(--fg);font-weight:600}
+.feats{display:grid;grid-template-columns:1fr 1fr;gap:16px;list-style:none}
+.feats li{background:var(--card);border-radius:18px;padding:22px 22px 20px;box-shadow:var(--shadow)}
+.feats h3{font-size:19px;font-weight:600;letter-spacing:-.02em;margin-bottom:6px}
+.feats p{font-size:15px;color:var(--fg2)}
+.pill{display:inline-block;font-size:12px;font-weight:600;padding:4px 10px;border-radius:999px;background:rgba(255,149,0,.15);color:#c93400;margin-bottom:14px}
+@media (prefers-color-scheme:dark){.pill{color:#ff9f0a}}
+.links{display:flex;gap:10px;flex-wrap:wrap;margin-top:28px}
+.btn{font-size:14px;padding:8px 16px;border-radius:999px;border:1px solid var(--line);color:var(--accent);display:inline-flex;align-items:center;min-height:32px}
+.btn:hover{background:var(--bg2)}
+.btn.primary{background:var(--accent);color:#fff;border-color:transparent}
+footer{text-align:center;color:var(--fg2);font-size:12px;padding:72px 22px 48px;padding-bottom:calc(48px + env(safe-area-inset-bottom));border-top:1px solid var(--line);margin-top:72px}
+footer a{color:var(--accent)}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+@media (forced-colors:active){h1{background:none;color:CanvasText;-webkit-text-fill-color:CanvasText}}
+</style>
+</head>
+<body>
+<a class="skip" href="#contenido">Saltar al contenido</a>
+<nav aria-label="Secciones de Red Casa"><div class="navin"><a class="brand" href="../#red-casa">Proyectos</a><a href="#que-es">Qué es</a><a href="#capacidades">Capacidades</a><a href="#acceso">Acceso</a><a href="#limites">Límites</a></div></nav>
+<header id="inicio">
+  <div class="wrap">
+    <p class="pill">En desarrollo</p>
+    <p class="eyebrow">Red de casa</p>
+    <h1>Red Casa</h1>
+    <p class="sub">Panel web para la red doméstica. El texto de esta página está tomado de la documentación del proyecto, consultada el 8 de noviembre de 2026. Esta web no ha ejecutado el programa.</p>
+  </div>
+</header>
+<main id="contenido">
+<section id="que-es" aria-labelledby="que-es-titulo">
+  <h2 id="que-es-titulo">Qué es</h2>
+  <div class="prose">
+    <p>La documentación lo describe como un panel, en español y sin cuenta, para ver los equipos de la subred de casa, avisar cuando aparece un dispositivo nuevo y registrar la velocidad y las caídas de Internet. Lo presenta sin telemetría propia.</p>
+    <p>Hay dos piezas descritas: una para Windows, un ejecutable sin instalador ni permisos de administrador, y otra para Linux en amd64. El programa está escrito en Go 1.22 o posterior y lleva la interfaz web en el mismo ejecutable. En el iPhone, la documentación describe añadirlo a la pantalla de inicio desde Safari. El claro y el oscuro siguen el ajuste del sistema.</p>
+    <p>Está en desarrollo. La documentación no lo da por instalado en casa.</p>
+    <p>La prueba de velocidad consulta un servicio público. Los avisos por webhook son opcionales y vienen desactivados. El resto del panel, según la documentación, no depende de una cuenta ni de un servicio en la nube.</p>
+  </div>
+</section>
+<section id="capacidades" aria-labelledby="capacidades-titulo">
+  <h2 id="capacidades-titulo">Capacidades documentadas</h2>
+  <ul class="feats">
+    <li>
+      <h3>Inventario</h3>
+      <p>Equipos de su propia subred. Una lista de «Mis dispositivos» y una bandeja de «Descubiertos», con dos acciones: añadir o ignorar siempre.</p>
+    </li>
+    <li>
+      <h3>Avisos</h3>
+      <p>Aviso de dispositivo nuevo a partir de un primer sondeo de referencia. Esos avisos se pueden apagar.</p>
+    </li>
+    <li>
+      <h3>Móviles</h3>
+      <p>Reconoce las direcciones MAC aleatorias de los móviles y las muestra como «MAC privada».</p>
+    </li>
+    <li>
+      <h3>Fabricantes</h3>
+      <p>Identifica fabricantes con la lista pública del IEEE, incluida en el programa para consultarla sin conexión.</p>
+    </li>
+    <li>
+      <h3>Caídas</h3>
+      <p>Vigila la latencia y anota las caídas de Internet, con inicio, fin y duración. Que falle solo el router no cuenta como caída.</p>
+    </li>
+    <li>
+      <h3>Velocidad</h3>
+      <p>Prueba contra un servicio público, a mano o de forma periódica, con gráficas de 24 horas, 7 días y 30 días. También mide la velocidad entre el teléfono y el ordenador, dentro de casa.</p>
+    </li>
+    <li>
+      <h3>Router</h3>
+      <p>Lectura opcional, solo de consulta, de un router doméstico compatible. Los cambios en el router nacen desactivados.</p>
+    </li>
+    <li>
+      <h3>Avisos externos</h3>
+      <p>Avisos opcionales por un webhook compatible con ntfy, desactivados por defecto.</p>
+    </li>
+  </ul>
+</section>
+<section id="acceso" aria-labelledby="acceso-titulo">
+  <h2 id="acceso-titulo">Acceso, según la documentación</h2>
+  <div class="prose">
+    <p>La documentación indica que solo atiende peticiones de la red local, que no abre puertos en el router porque no usa UPnP, que no se actualiza solo y que no ejecuta órdenes llegadas por la red. El acceso va con un token.</p>
+    <p>Funciona por HTTP. La documentación lo sitúa dentro de casa y avisa de que no está pensado para exponerlo a Internet. El HTTPS queda para un certificado propio. Las notificaciones push en iOS necesitan ese HTTPS.</p>
+    <p>También describe un modo de demostración que no sondea la red ni mide, y que puede mostrar una vista de ejemplo.</p>
+  </div>
+</section>
+<section id="limites" aria-labelledby="limites-titulo">
+  <h2 id="limites-titulo">Límites documentados</h2>
+  <div class="prose">
+    <p>No ve los dispositivos que estén en otra red Wi-Fi aislada, por ejemplo una de domótica. No sondea una subred más amplia que una /24.</p>
+    <p>Esta página no añade resultados de pruebas. Lo anterior es lo que dice la documentación del proyecto.</p>
+  </div>
+  <div class="links">
+    <a class="btn primary" href="../#red-casa">Volver a la ficha</a>
+    <a class="btn" href="../storage-hub/">Storage Hub</a>
+  </div>
+</section>
+</main>
+<footer>© 2026 Miguel Rodríguez Saiz · ArduSolutions · <a href="../#inicio">Todos los proyectos</a></footer>
+</body>
+</html>

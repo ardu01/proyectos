@@ -22,6 +22,8 @@ ARTICLE_IDS = [
     "avatar-engine",
     "cad",
     "os-apple",
+    "red-casa",
+    "storage-hub",
     "orbit-terminal",
     "orbit-os",
     "sopa-web",
@@ -61,6 +63,8 @@ REQUIRED_HREFS = [
     "#terminado",
     "#aparcado",
     "https://ardu01.github.io/zalmann-os-web/",
+    "red-casa/",
+    "storage-hub/",
 ]
 
 KEPT_SNIPPETS = [
@@ -144,10 +148,10 @@ class SiteTests(unittest.TestCase):
     def test_catalog_counts_and_order(self) -> None:
         ids = re.findall(r'<article class="card reveal" id="([^"]+)">', self.index_text)
         self.assertEqual(ids, ARTICLE_IDS)
-        self.assertEqual(len(ids), 18)
-        self.assertIn(">18</b>proyectos", self.index_text)
+        self.assertEqual(len(ids), 20)
+        self.assertIn(">20</b>proyectos", self.index_text)
         self.assertIn(">3</b><span class=\"dot hi\"></span>prioritarios", self.index_text)
-        self.assertIn(">3</b><span class=\"dot dev\"></span>secundarios", self.index_text)
+        self.assertIn(">5</b><span class=\"dot dev\"></span>secundarios", self.index_text)
         self.assertIn(">9</b><span class=\"dot ok\"></span>terminados", self.index_text)
         self.assertIn(">3</b><span class=\"dot idea\"></span>aparcados", self.index_text)
         priority = self.index_text.split('id="prioritario"', 1)[1].split('id="secundario"', 1)[0]
@@ -155,9 +159,11 @@ class SiteTests(unittest.TestCase):
         self.assertLess(priority.index("sopa-ia"), priority.index("jerry"))
         self.assertLess(priority.index("jerry"), priority.index("zalmann-os"))
         secondary = self.index_text.split('id="secundario"', 1)[1].split('id="terminado"', 1)[0]
-        self.assertIn('<span class="count">3</span>', secondary)
-        for name in ("avatar-engine", "cad", "os-apple"):
+        self.assertIn('<span class="count">5</span>', secondary)
+        for name in ("avatar-engine", "cad", "os-apple", "red-casa", "storage-hub"):
             self.assertIn(name, secondary)
+        self.assertLess(secondary.index("os-apple"), secondary.index("red-casa"))
+        self.assertLess(secondary.index("red-casa"), secondary.index("storage-hub"))
 
     def test_existing_links_and_cards_remain(self) -> None:
         for href in REQUIRED_HREFS:
@@ -177,17 +183,20 @@ class SiteTests(unittest.TestCase):
         self.assertIn("Repositorio privado", card)
         self.assertNotIn(PRIVATE_REPO, card)
         self.assertFalse((ROOT / "zalmann-os").exists())
-        self.assertFalse((ROOT / "red-casa").exists())
-        self.assertFalse((ROOT / "storage-hub").exists())
+        self.assertTrue((ROOT / "red-casa" / "index.html").is_file())
+        self.assertTrue((ROOT / "storage-hub" / "index.html").is_file())
 
     def test_internal_links_resolve(self) -> None:
-        for page, parser in ((INDEX, self.index),):
+        pages = sorted(ROOT.rglob("*.html"))
+        self.assertGreaterEqual(len(pages), 3)
+        for page in pages:
+            _text, parser = parse(page)
             for href in parser.hrefs:
                 resolved = resolve(page, href)
                 if resolved is None:
                     continue
                 target, frag = resolved
-                self.assertTrue(target.is_file(), f"{href} desde {page.name} no existe ({target})")
+                self.assertTrue(target.is_file(), f"{href} desde {page} no existe ({target})")
                 if frag:
                     text = target.read_text(encoding="utf-8")
                     self.assertRegex(text, rf'id="{re.escape(frag)}"')
@@ -261,8 +270,57 @@ class SiteTests(unittest.TestCase):
             self.assertIn("pestaña nueva", tag, tag)
             self.assertIn('rel="noopener"', tag, tag)
 
+    def test_lan_pages_follow_the_documentation(self) -> None:
+        red_card = self.index_text.split('id="red-casa"', 1)[1].split("</article>", 1)[0]
+        hub_card = self.index_text.split('id="storage-hub"', 1)[1].split("</article>", 1)[0]
+        self.assertIn('href="red-casa/"', red_card)
+        self.assertIn('href="storage-hub/"', hub_card)
+        self.assertNotIn("target=", red_card)
+        self.assertNotIn("target=", hub_card)
+        self.assertIn("En desarrollo", red_card)
+        self.assertIn("En desarrollo", hub_card)
+        self.assertIn("Según la documentación", red_card)
+        self.assertIn("La documentación de estado indica la versión 4.1.0.", hub_card)
+        self.assertNotIn("github.com", red_card)
+        self.assertNotIn("github.com", hub_card)
+        for label in ("desplegado", "instalado en casa", "prueba superada"):
+            self.assertNotIn(label, red_card)
+            self.assertNotIn(label, hub_card)
+
+        red = (ROOT / "red-casa" / "index.html").read_text(encoding="utf-8")
+        hub = (ROOT / "storage-hub" / "index.html").read_text(encoding="utf-8")
+        for page, name in ((red, "red-casa"), (hub, "storage-hub")):
+            self.assertNotIn("<img", page, name)
+            self.assertNotIn("captura", page.lower(), name)
+            self.assertNotIn("galería", page.lower(), name)
+            self.assertNotIn("mockup", page.lower(), name)
+            self.assertNotIn("seguridad absoluta", page.lower(), name)
+            self.assertIn("Esta web no ha ejecutado el programa.", page, name)
+            self.assertIn("En desarrollo", page, name)
+            self.assertIn('name="viewport" content="width=1124, viewport-fit=cover"', page, name)
+            self.assertIn("prefers-color-scheme:dark", page, name)
+            self.assertIn('class="skip" href="#contenido"', page, name)
+        self.assertIn("servicio público", red)
+        self.assertIn("desactivados por defecto", red)
+        self.assertIn("Funciona por HTTP.", red)
+        self.assertIn("no usa UPnP", red)
+        self.assertIn("/24", red)
+        self.assertIn("MAC privada", red)
+        self.assertIn('href="../#red-casa"', red)
+        self.assertIn('href="../storage-hub/"', red)
+        self.assertIn("La documentación de estado indica la versión 4.1.0.", hub)
+        self.assertIn("no lo da por instalado en los equipos de casa", hub)
+        self.assertIn("SHA-256", hub)
+        self.assertIn("solo lectura", hub)
+        self.assertIn("No admite IPv6.", hub)
+        self.assertIn("Esta web no ha ejecutado esas pruebas", hub)
+        self.assertIn('href="../#storage-hub"', hub)
+        self.assertIn('href="../red-casa/"', hub)
+        self.assertNotIn("github.com", red)
+        self.assertNotIn("github.com", hub)
+
     def test_no_private_repo_link_secrets_or_invented_claims(self) -> None:
-        pages = [INDEX, ROOT / "README.md"]
+        pages = [INDEX, ROOT / "README.md", *sorted(ROOT.rglob("*.html"))]
         banned = [
             "github.com/" + "ardu01/" + "red-casa",
             "github.com/" + "ardu01/" + "storage-hub",
