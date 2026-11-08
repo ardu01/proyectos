@@ -323,8 +323,8 @@ try {
     returnByValue: true,
   });
   const counts = census.result.value;
-  check(counts.total === "20", "el total no es 20: " + counts.total);
-  check(counts.priority === 3 && counts.secondary === 3 && counts.done === 11 && counts.parked === 3, "los grupos no cuadran: " + JSON.stringify(counts));
+  check(counts.total === "21", "el total no es 21: " + counts.total);
+  check(counts.priority === 3 && counts.secondary === 3 && counts.done === 12 && counts.parked === 3, "los grupos no cuadran: " + JSON.stringify(counts));
 
   function contrastOf(fg, bg) {
     const lin = (v) => {
@@ -372,7 +372,7 @@ try {
   await cdp.send("Runtime.evaluate", { expression: `document.querySelector("#terminado").scrollIntoView({block:"start"})` });
   await delay(200);
   const lightLabels = await labelReport();
-  check(lightLabels.done.length === 11, "en claro no hay 11 etiquetas verdes");
+  check(lightLabels.done.length === 12, "en claro no hay 12 etiquetas verdes");
   check(lightLabels.dev.length === 4, "en claro no hay 4 etiquetas En desarrollo");
   check(lightLabels.pause.startsWith("En pausa") && lightLabels.nav === "En pausa", "el texto visible no es En pausa");
   for (const pill of lightLabels.done) {
@@ -396,7 +396,7 @@ try {
   await cdp.send("Runtime.evaluate", { expression: `document.querySelector("#terminado").scrollIntoView({block:"start"})` });
   await delay(200);
   const darkLabels = await labelReport();
-  check(darkLabels.done.length === 11 && darkLabels.dev.length === 4, "en oscuro faltan etiquetas");
+  check(darkLabels.done.length === 12 && darkLabels.dev.length === 4, "en oscuro faltan etiquetas");
   for (const pill of darkLabels.done) {
     check(contrastOf(pill.color, pill.bg) >= 4.5, "contraste verde oscuro " + contrastOf(pill.color, pill.bg).toFixed(2));
     check(pill.color.g > pill.color.r, "en oscuro la etiqueta de terminado no es verde");
