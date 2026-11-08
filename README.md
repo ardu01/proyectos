@@ -8,7 +8,7 @@ Zalmann OS está en Prioritario y enlaza a https://ardu01.github.io/zalmann-os-w
 
 En la ficha de SopaCAD, las 431 pruebas automáticas corresponden a las versiones hasta la 0.41. La 0.42 es la primera con el nombre SopaCAD y esta ficha no documenta su validación.
 
-Red Casa y Storage Hub están en Secundario, con página en `red-casa/` y `storage-hub/`. El texto sale de la documentación de cada proyecto y no presenta pruebas ejecutadas para esta web. El código no se enlaza.
+Red Casa y Storage Hub están en Secundario, con página en `red-casa/` y `storage-hub/`. El texto sale de la documentación de cada proyecto. Cada página incluye una captura real de la interfaz en demostración, con el pie correspondiente. El código no se enlaza.
 
 HTML estático, sin dependencias, sin cookies ni rastreadores, con modo claro y oscuro según el sistema y el lienzo de escritorio escalado en el iPhone. Se publica con GitHub Pages desde la raíz de la rama `main`. Esta rama no publica ni despliega nada.
 

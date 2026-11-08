@@ -43,6 +43,9 @@ h2{font-size:clamp(28px,3.6vw,40px);font-weight:700;letter-spacing:-.03em;margin
 .feats p{font-size:15px;color:var(--fg2)}
 .pill{display:inline-block;font-size:12px;font-weight:600;padding:4px 10px;border-radius:999px;background:rgba(255,149,0,.15);color:#c93400;margin-bottom:14px}
 @media (prefers-color-scheme:dark){.pill{color:#ff9f0a}}
+.shot{margin:0}
+.shot img{display:block;width:100%;max-width:420px;height:auto;border-radius:28px;box-shadow:var(--shadow);background:var(--card)}
+.shot figcaption{margin-top:12px;max-width:760px;font-size:15px;color:var(--fg2)}
 .links{display:flex;gap:10px;flex-wrap:wrap;margin-top:28px}
 .btn{font-size:14px;padding:8px 16px;border-radius:999px;border:1px solid var(--line);color:var(--accent);display:inline-flex;align-items:center;min-height:32px}
 .btn:hover{background:var(--bg2)}
@@ -55,16 +58,23 @@ footer a{color:var(--accent)}
 </head>
 <body>
 <a class="skip" href="#contenido">Saltar al contenido</a>
-<nav aria-label="Secciones de Red Casa"><div class="navin"><a class="brand" href="../#red-casa">Proyectos</a><a href="#que-es">Qué es</a><a href="#capacidades">Capacidades</a><a href="#acceso">Acceso</a><a href="#limites">Límites</a></div></nav>
+<nav aria-label="Secciones de Red Casa"><div class="navin"><a class="brand" href="../#red-casa">Proyectos</a><a href="#demostracion">Demostración</a><a href="#que-es">Qué es</a><a href="#capacidades">Capacidades</a><a href="#acceso">Acceso</a><a href="#limites">Límites</a></div></nav>
 <header id="inicio">
   <div class="wrap">
     <p class="pill">En desarrollo</p>
     <p class="eyebrow">Red de casa</p>
     <h1>Red Casa</h1>
-    <p class="sub">Panel web para la red doméstica. El texto de esta página está tomado de la documentación del proyecto, consultada el 8 de noviembre de 2026. Esta web no ha ejecutado el programa.</p>
+    <p class="sub">Panel web para la red doméstica. El texto de esta página está tomado de la documentación del proyecto, consultada el 8 de noviembre de 2026. La imagen es la pantalla Dispositivos en modo demostración, sin sondeo de red.</p>
   </div>
 </header>
 <main id="contenido">
+<section id="demostracion" aria-labelledby="demostracion-titulo">
+  <h2 id="demostracion-titulo">Demostración</h2>
+  <figure class="shot">
+    <img src="../assets/red-casa-demo.png" width="780" height="1704" alt="Interfaz real en modo demostración, con dispositivos ficticios y sin sondeo de red.">
+    <figcaption>Interfaz real en modo demostración, con dispositivos ficticios y sin sondeo de red.</figcaption>
+  </figure>
+</section>
 <section id="que-es" aria-labelledby="que-es-titulo">
   <h2 id="que-es-titulo">Qué es</h2>
   <div class="prose">

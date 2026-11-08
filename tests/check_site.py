@@ -290,16 +290,32 @@ class SiteTests(unittest.TestCase):
         red = (ROOT / "red-casa" / "index.html").read_text(encoding="utf-8")
         hub = (ROOT / "storage-hub" / "index.html").read_text(encoding="utf-8")
         for page, name in ((red, "red-casa"), (hub, "storage-hub")):
-            self.assertNotIn("<img", page, name)
-            self.assertNotIn("captura", page.lower(), name)
+            self.assertEqual(page.count("<img "), 1, name)
             self.assertNotIn("galería", page.lower(), name)
             self.assertNotIn("mockup", page.lower(), name)
             self.assertNotIn("seguridad absoluta", page.lower(), name)
-            self.assertIn("Esta web no ha ejecutado el programa.", page, name)
+            self.assertIn('id="demostracion"', page, name)
             self.assertIn("En desarrollo", page, name)
             self.assertIn('name="viewport" content="width=1124, viewport-fit=cover"', page, name)
             self.assertIn("prefers-color-scheme:dark", page, name)
             self.assertIn('class="skip" href="#contenido"', page, name)
+        red_caption = "Interfaz real en modo demostración, con dispositivos ficticios y sin sondeo de red."
+        hub_caption = "Interfaz real en demostración aislada con datos ficticios; no muestra equipos ni discos reales."
+        self.assertIn(f'alt="{red_caption}"', red)
+        self.assertIn(f"<figcaption>{red_caption}</figcaption>", red)
+        self.assertIn('src="../assets/red-casa-demo.png"', red)
+        self.assertIn(f'alt="{hub_caption}"', hub)
+        self.assertIn(f"<figcaption>{hub_caption}</figcaption>", hub)
+        self.assertIn('src="../assets/storage-hub-demo.png"', hub)
+        self.assertIn("no la muestra como disponible", hub)
+        for name, filename in (
+            ("red-casa-demo.png", ROOT / "assets" / "red-casa-demo.png"),
+            ("storage-hub-demo.png", ROOT / "assets" / "storage-hub-demo.png"),
+        ):
+            data = filename.read_bytes()
+            self.assertTrue(data.startswith(b"\x89PNG\r\n\x1a\n"), name)
+            self.assertNotIn(b"Exif", data, name)
+            self.assertGreater(len(data), 1000, name)
         self.assertIn("servicio público", red)
         self.assertIn("desactivados por defecto", red)
         self.assertIn("Funciona por HTTP.", red)

@@ -329,33 +329,56 @@ try {
 
   const pageShots = [];
   for (const spec of [
-    { path: "red-casa/", title: "Red Casa", light: "vista-web-red-casa-claro", darkShot: "vista-web-red-casa-oscuro", phoneShot: "" },
-    { path: "storage-hub/", title: "Storage Hub", light: "vista-web-storage-hub-claro", darkShot: "", phoneShot: "vista-web-storage-hub-iphone" },
+    { path: "red-casa/", title: "Red Casa", asset: "red-casa-demo.png", caption: "Interfaz real en modo demostración, con dispositivos ficticios y sin sondeo de red.", light: "vista-web-red-casa-demo", darkShot: "vista-web-red-casa-oscuro", phoneShot: "vista-web-red-casa-iphone" },
+    { path: "storage-hub/", title: "Storage Hub", asset: "storage-hub-demo.png", caption: "Interfaz real en demostración aislada con datos ficticios; no muestra equipos ni discos reales.", light: "vista-web-storage-hub-demo", darkShot: "", phoneShot: "vista-web-storage-hub-iphone" },
   ]) {
+    const assetRes = await fetch(`http://127.0.0.1:${WEB}/assets/${spec.asset}`);
+    check(assetRes.status === 200, `${spec.asset} HTTP ${assetRes.status}`);
+    const assetBytes = await assetRes.arrayBuffer();
+    check(assetBytes.byteLength > 1000, `${spec.asset} vacío`);
     const opened = await openPage(`http://127.0.0.1:${WEB}/${spec.path}`);
     await settle(opened.cdp);
     await setView(opened.cdp, 1440, 900, "light", false);
+    await opened.cdp.send("Runtime.evaluate", {
+      expression: `Promise.all([...document.images].map((img) => img.complete && img.naturalWidth > 0 ? true : new Promise((resolve) => { img.addEventListener("load", () => resolve(true), { once: true }); img.addEventListener("error", () => resolve(false), { once: true }); })))`,
+      awaitPromise: true,
+    });
+    await opened.cdp.send("Runtime.evaluate", {
+      expression: `document.querySelector("#demostracion").scrollIntoView({ block: "start" })`,
+    });
+    await delay(200);
     const info = await opened.cdp.send("Runtime.evaluate", {
       expression: `(() => {
         const doc = document.documentElement;
         const back = document.querySelector("a.btn.primary");
+        const img = document.querySelector("#demostracion img");
+        const caption = document.querySelector("#demostracion figcaption");
         return {
           h1: document.querySelector("h1").textContent,
           imgs: document.images.length,
+          naturalWidth: img ? img.naturalWidth : 0,
+          naturalHeight: img ? img.naturalHeight : 0,
+          alt: img ? img.alt : "",
+          caption: caption ? caption.textContent : "",
+          label: document.querySelector("#demostracion h2")?.textContent || "",
           github: document.body.innerText.toLowerCase().includes("github.com"),
-          executed: document.body.innerText.includes("Esta web no ha ejecutado el programa."),
           overflow: doc.scrollWidth > doc.clientWidth + 1,
           bg: getComputedStyle(document.body).backgroundColor,
           back: back ? back.getAttribute("href") : "",
+          displayedWidth: img ? img.getBoundingClientRect().width : 0,
         };
       })()`,
       returnByValue: true,
     });
     const page = info.result.value;
     check(page.h1 === spec.title, `${spec.path} título inesperado: ${page.h1}`);
-    check(page.imgs === 0, `${spec.path} incluye imágenes`);
+    check(page.imgs === 1, `${spec.path} imágenes: ${page.imgs}`);
+    check(page.naturalWidth > 0 && page.naturalHeight > 0, `${spec.path} naturalWidth ${page.naturalWidth}`);
+    check(page.alt === spec.caption, `${spec.path} alt distinto`);
+    check(page.caption === spec.caption, `${spec.path} pie distinto`);
+    check(page.label === "Demostración", `${spec.path} sin etiqueta visible`);
+    check(page.displayedWidth >= 200 && page.displayedWidth <= 1080, `${spec.path} ancho mostrado ${page.displayedWidth}`);
     check(!page.github, `${spec.path} muestra un enlace de GitHub`);
-    check(page.executed, `${spec.path} no dice que esta web no ha ejecutado el programa`);
     check(!page.overflow, `${spec.path} desborda en claro`);
     check(page.bg === "rgb(251, 251, 253)", `${spec.path} fondo claro: ${page.bg}`);
     check(page.back.startsWith("../#"), `${spec.path} no vuelve a su ficha: ${page.back}`);
@@ -377,8 +400,10 @@ try {
     await opened.cdp.send("Emulation.setDeviceMetricsOverride", {
       width: 390, height: 844, deviceScaleFactor: 3, mobile: true,
     });
-    await opened.cdp.send("Runtime.evaluate", { expression: "window.scrollTo(0, 0)" });
-    await delay(200);
+    await opened.cdp.send("Runtime.evaluate", {
+      expression: `document.querySelector("#demostracion").scrollIntoView({ block: "start" })`,
+    });
+    await delay(250);
     const phonePage = await opened.cdp.send("Runtime.evaluate", {
       expression: `(() => {
         const doc = document.documentElement;
