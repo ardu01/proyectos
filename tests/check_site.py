@@ -22,6 +22,7 @@ ARTICLE_IDS = [
     "avatar-engine",
     "cad",
     "os-apple",
+    "rea-studio",
     "orbit-terminal",
     "orbit-os",
     "sopa-web",
@@ -65,6 +66,8 @@ REQUIRED_HREFS = [
     "#aparcado",
     "https://ardu01.github.io/zalmann-os-web/",
     "https://github.com/ardu01/zalman-r1-bandeja-hdd-3.5",
+    "https://github.com/ardu01/rea-studio",
+    "https://github.com/ardu01/rea-studio/releases/tag/v0.1.0",
     "red-casa/",
     "storage-hub/",
 ]
@@ -150,10 +153,10 @@ class SiteTests(unittest.TestCase):
     def test_catalog_counts_and_order(self) -> None:
         ids = re.findall(r'<article class="card reveal" id="([^"]+)">', self.index_text)
         self.assertEqual(ids, ARTICLE_IDS)
-        self.assertEqual(len(ids), 21)
-        self.assertIn(">21</b>proyectos", self.index_text)
+        self.assertEqual(len(ids), 22)
+        self.assertIn(">22</b>proyectos", self.index_text)
         self.assertIn(">3</b><span class=\"dot hi\"></span>prioritarios", self.index_text)
-        self.assertIn(">3</b><span class=\"dot dev\"></span>secundarios", self.index_text)
+        self.assertIn(">4</b><span class=\"dot dev\"></span>secundarios", self.index_text)
         self.assertIn(">12</b><span class=\"dot ok\"></span>terminados", self.index_text)
         self.assertIn(">3</b><span class=\"dot idea\"></span>en pausa", self.index_text)
         self.assertNotIn("aparcados", self.index_text)
@@ -164,9 +167,11 @@ class SiteTests(unittest.TestCase):
         self.assertLess(priority.index("sopa-ia"), priority.index("jerry"))
         self.assertLess(priority.index("jerry"), priority.index("zalmann-os"))
         secondary = self.index_text.split('id="secundario"', 1)[1].split('id="terminado"', 1)[0]
-        self.assertIn('<span class="count">3</span>', secondary)
-        for name in ("avatar-engine", "cad", "os-apple"):
+        self.assertIn('<span class="count">4</span>', secondary)
+        for name in ("avatar-engine", "cad", "os-apple", "rea-studio"):
             self.assertIn(name, secondary)
+        self.assertLess(secondary.index("os-apple"), secondary.index("rea-studio"))
+        self.assertEqual(secondary.count('class="pill dev">En desarrollo'), 2)
         self.assertNotIn("red-casa", secondary)
         self.assertNotIn("storage-hub", secondary)
         finished = self.index_text.split('id="terminado"', 1)[1].split('id="aparcado"', 1)[0]
@@ -194,11 +199,22 @@ class SiteTests(unittest.TestCase):
             card = self.index_text.split(f'id="{name}"', 1)[1].split("</article>", 1)[0]
             self.assertNotIn('class="pill ok"', card, name)
             self.assertNotIn('class="pill dev"', card, name)
-        for name in ("sopa-ia", "jerry", "zalmann-os", "cad"):
+        for name in ("sopa-ia", "jerry", "zalmann-os", "cad", "rea-studio"):
             card = self.index_text.split(f'id="{name}"', 1)[1].split("</article>", 1)[0]
             self.assertIn('class="pill dev">En desarrollo', card, name)
             self.assertNotIn('class="pill ok"', card, name)
-        self.assertEqual(secondary.count('class="pill dev">En desarrollo'), 1)
+        studio = self.index_text.split('id="rea-studio"', 1)[1].split("</article>", 1)[0]
+        self.assertIn("Estación de escritorio para análisis estático de software.", studio)
+        self.assertIn("probadas con sustitutos, no con las herramientas reales.", studio)
+        self.assertIn("Vista previa 0.1.0, licencia MIT", studio)
+        self.assertIn("el instalador no está firmado", studio)
+        self.assertIn("17 pruebas", studio)
+        self.assertNotIn('class="pill ok"', studio)
+        self.assertNotIn("rea-studio-web", studio)
+        codex = self.index_text.split('id="rea-codex"', 1)[1].split("</article>", 1)[0]
+        self.assertIn("REA Codex", codex)
+        self.assertIn('class="pill ok">Terminado / mantener', codex)
+        self.assertNotIn('class="pill dev"', codex)
 
     def test_existing_links_and_cards_remain(self) -> None:
         for href in REQUIRED_HREFS:
@@ -270,8 +286,8 @@ class SiteTests(unittest.TestCase):
         self.assertEqual(total, len(ARTICLE_IDS))
         self.assertIn("Fuente de verdad del catálogo: este index.html.", self.index_text)
         readme = (ROOT / "README.md").read_text(encoding="utf-8")
-        self.assertIn("fuente de verdad", readme)
-        self.assertIn("no debe regenerar", readme)
+        self.assertIn("fuente de verdad", readme.lower())
+        self.assertIn("no debe regenerar", readme.lower())
 
     def test_sopacad_tests_stop_at_0_41(self) -> None:
         card = self.index_text.split('id="cad"', 1)[1].split("</article>", 1)[0]
