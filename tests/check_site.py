@@ -177,7 +177,9 @@ class SiteTests(unittest.TestCase):
         self.assertEqual(finished.count('class="pill ok">Terminado / mantener'), 12)
         tray = self.index_text.split('id="bandeja-zalman-r1"', 1)[1].split("</article>", 1)[0]
         self.assertIn("Bandeja para disco duro de 3,5 pulgadas diseñada para la torre Zalman R1.", tray)
-        self.assertIn("los archivos de diseño no están subidos", tray)
+        self.assertIn("Archivos de diseño pendientes de publicación.", tray)
+        self.assertNotIn("SLDPRT", tray)
+        self.assertNotIn("STL", tray)
         self.assertIn('href="https://github.com/ardu01/zalman-r1-bandeja-hdd-3.5"', tray)
         self.assertNotIn("Descargar", tray)
         self.assertNotIn("zalmann-os", tray)
