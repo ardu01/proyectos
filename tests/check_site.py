@@ -22,8 +22,6 @@ ARTICLE_IDS = [
     "avatar-engine",
     "cad",
     "os-apple",
-    "red-casa",
-    "storage-hub",
     "orbit-terminal",
     "orbit-os",
     "sopa-web",
@@ -33,6 +31,8 @@ ARTICLE_IDS = [
     "clash-progreso",
     "monitor-msi",
     "rea-codex",
+    "red-casa",
+    "storage-hub",
     "motor-ligero",
     "axiom-lab",
     "android-deck",
@@ -151,19 +151,23 @@ class SiteTests(unittest.TestCase):
         self.assertEqual(len(ids), 20)
         self.assertIn(">20</b>proyectos", self.index_text)
         self.assertIn(">3</b><span class=\"dot hi\"></span>prioritarios", self.index_text)
-        self.assertIn(">5</b><span class=\"dot dev\"></span>secundarios", self.index_text)
-        self.assertIn(">9</b><span class=\"dot ok\"></span>terminados", self.index_text)
+        self.assertIn(">3</b><span class=\"dot dev\"></span>secundarios", self.index_text)
+        self.assertIn(">11</b><span class=\"dot ok\"></span>terminados", self.index_text)
         self.assertIn(">3</b><span class=\"dot idea\"></span>aparcados", self.index_text)
         priority = self.index_text.split('id="prioritario"', 1)[1].split('id="secundario"', 1)[0]
         self.assertIn('<span class="count">3</span>', priority)
         self.assertLess(priority.index("sopa-ia"), priority.index("jerry"))
         self.assertLess(priority.index("jerry"), priority.index("zalmann-os"))
         secondary = self.index_text.split('id="secundario"', 1)[1].split('id="terminado"', 1)[0]
-        self.assertIn('<span class="count">5</span>', secondary)
-        for name in ("avatar-engine", "cad", "os-apple", "red-casa", "storage-hub"):
+        self.assertIn('<span class="count">3</span>', secondary)
+        for name in ("avatar-engine", "cad", "os-apple"):
             self.assertIn(name, secondary)
-        self.assertLess(secondary.index("os-apple"), secondary.index("red-casa"))
-        self.assertLess(secondary.index("red-casa"), secondary.index("storage-hub"))
+        self.assertNotIn("red-casa", secondary)
+        self.assertNotIn("storage-hub", secondary)
+        finished = self.index_text.split('id="terminado"', 1)[1].split('id="aparcado"', 1)[0]
+        self.assertIn('<span class="count">11</span>', finished)
+        self.assertLess(finished.index("rea-codex"), finished.index("red-casa"))
+        self.assertLess(finished.index("red-casa"), finished.index("storage-hub"))
 
     def test_existing_links_and_cards_remain(self) -> None:
         for href in REQUIRED_HREFS:
@@ -277,13 +281,17 @@ class SiteTests(unittest.TestCase):
         self.assertIn('href="storage-hub/"', hub_card)
         self.assertNotIn("target=", red_card)
         self.assertNotIn("target=", hub_card)
-        self.assertIn("En desarrollo", red_card)
-        self.assertIn("En desarrollo", hub_card)
+        self.assertIn("Terminado / mantener", red_card)
+        self.assertIn("Terminado / mantener", hub_card)
+        self.assertNotIn("En desarrollo", red_card)
+        self.assertNotIn("En desarrollo", hub_card)
+        self.assertIn("no lo da por instalado en casa", red_card)
+        self.assertIn("No lo da por instalado en los equipos de casa.", hub_card)
         self.assertIn("Según la documentación", red_card)
         self.assertIn("La documentación de estado indica la versión 4.1.0.", hub_card)
         self.assertNotIn("github.com", red_card)
         self.assertNotIn("github.com", hub_card)
-        for label in ("desplegado", "instalado en casa", "prueba superada"):
+        for label in ("desplegado", "prueba superada", "garantía"):
             self.assertNotIn(label, red_card)
             self.assertNotIn(label, hub_card)
 
@@ -295,7 +303,8 @@ class SiteTests(unittest.TestCase):
             self.assertNotIn("mockup", page.lower(), name)
             self.assertNotIn("seguridad absoluta", page.lower(), name)
             self.assertIn('id="demostracion"', page, name)
-            self.assertIn("En desarrollo", page, name)
+            self.assertIn("Terminado / mantener", page, name)
+            self.assertNotIn("En desarrollo", page, name)
             self.assertIn('name="viewport" content="width=1124, viewport-fit=cover"', page, name)
             self.assertIn("prefers-color-scheme:dark", page, name)
             self.assertIn('class="skip" href="#contenido"', page, name)

@@ -324,7 +324,7 @@ try {
   });
   const counts = census.result.value;
   check(counts.total === "20", "el total no es 20: " + counts.total);
-  check(counts.priority === 3 && counts.secondary === 5 && counts.done === 9 && counts.parked === 3, "los grupos no cuadran: " + JSON.stringify(counts));
+  check(counts.priority === 3 && counts.secondary === 3 && counts.done === 11 && counts.parked === 3, "los grupos no cuadran: " + JSON.stringify(counts));
   check(counts.red === "red-casa/" && counts.hub === "storage-hub/", "las fichas nuevas no enlazan sus páginas");
 
   const pageShots = [];
