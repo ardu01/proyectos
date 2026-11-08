@@ -212,8 +212,112 @@ try {
   check(info.revealed, "la ficha no entra en pantalla");
   check(!info.text.includes("github.com"), "la ficha no debe mostrar un enlace a GitHub");
 
+  const sopa = await cdp.send("Runtime.evaluate", {
+    expression: `document.querySelector("#cad").innerText`,
+    returnByValue: true,
+  });
+  const sopaText = sopa.result.value;
+  check(sopaText.includes("Las 431 pruebas automáticas corresponden a las versiones hasta la 0.41."), "SopaCAD no acota las 431 pruebas a la 0.41");
+  check(sopaText.includes("La 0.42 es la primera con el nombre SopaCAD"), "SopaCAD no identifica la 0.42");
+  check(sopaText.includes("su validación no está documentada en esta ficha."), "falta el matiz de la 0.42");
+  check(!sopaText.includes("Última versión: 0.42"), "sigue el texto que junta las 431 pruebas con la 0.42");
+
+  await setView(cdp, 1440, 900, "dark", false);
+  const darkM = await metrics(cdp);
+  await setView(cdp, 1440, 900, "light", false);
+  const lightM = await metrics(cdp);
+  check(darkM.bg !== lightM.bg, "claro y oscuro comparten fondo");
+  check(lightM.bg === "rgb(251, 251, 253)", "fondo claro inesperado: " + lightM.bg);
+  check(darkM.bg === "rgb(0, 0, 0)", "fondo oscuro inesperado: " + darkM.bg);
+
+  await cdp.send("Runtime.evaluate", {
+    expression: `window.scrollTo(0, 0)`,
+  });
+  await delay(200);
+  const countersShot = await shot(cdp, "index-contadores-light");
+
+  await setView(cdp, 1440, 900, "dark", false);
+  await cdp.send("Runtime.evaluate", { expression: `window.scrollTo(0, 0)` });
+  await delay(200);
+  const darkShot = await shot(cdp, "index-contadores-dark");
+
+  await setView(cdp, 1440, 900, "light", false);
+  await cdp.send("Runtime.evaluate", { expression: `window.scrollTo(0, 0)` });
+  await delay(100);
+  const skip = await cdp.send("Runtime.evaluate", {
+    expression: `(() => {
+      const link = document.querySelector("a.skip");
+      const hidden = link.getBoundingClientRect();
+      link.focus();
+      const shown = link.getBoundingClientRect();
+      return {
+        href: link.getAttribute("href"),
+        hiddenTop: hidden.top,
+        top: shown.top,
+        width: shown.width,
+        height: shown.height,
+      };
+    })()`,
+    returnByValue: true,
+  });
+  const skipInfo = skip.result.value;
+  check(skipInfo.href === "#contenido", "el salto no apunta al contenido");
+  check(skipInfo.hiddenTop < 0, "el salto se ve antes de recibir el foco: " + JSON.stringify(skipInfo));
+  check(skipInfo.top >= 0 && skipInfo.top < 80 && skipInfo.width >= 24 && skipInfo.height >= 24, "el salto no queda visible al foco: " + JSON.stringify(skipInfo));
+  await cdp.send("Runtime.evaluate", {
+    expression: `document.querySelector("a.skip").blur(); true`,
+    returnByValue: true,
+  });
+
+  await cdp.send("Runtime.evaluate", {
+    expression: `new Promise((resolve) => {
+      const el = document.querySelector("#cad");
+      el.scrollIntoView({ block: "center" });
+      const tick = () => el.classList.contains("in") ? resolve(true) : setTimeout(tick, 40);
+      setTimeout(() => resolve(false), 2000);
+      tick();
+    })`,
+    awaitPromise: true,
+  });
+  await delay(900);
+  const sopaShot = await shot(cdp, "index-sopacad-light");
+
+  await cdp.send("Emulation.setDeviceMetricsOverride", {
+    width: 390, height: 844, deviceScaleFactor: 3, mobile: true,
+  });
+  await cdp.send("Runtime.evaluate", { expression: `window.scrollTo(0, 0)` });
+  await delay(250);
+  const phoneEval = await cdp.send("Runtime.evaluate", {
+    expression: `(() => {
+      const doc = document.documentElement;
+      return {
+        clientWidth: doc.clientWidth,
+        scrollWidth: doc.scrollWidth,
+        innerWidth: window.innerWidth,
+        scale: window.visualViewport ? window.visualViewport.scale : null,
+        viewport: document.querySelector('meta[name="viewport"]').content,
+        minWidth: getComputedStyle(doc).minWidth,
+      };
+    })()`,
+    returnByValue: true,
+  });
+  const phone = phoneEval.result.value;
+  check(String(phone.viewport).includes("width=1124"), "el viewport no fija el lienzo de 1124");
+  check(phone.scrollWidth <= phone.clientWidth + 1, `el iPhone desborda (${phone.scrollWidth}/${phone.clientWidth}, escala ${phone.scale})`);
+  check(
+    phone.clientWidth >= 1100 || (typeof phone.scale === "number" && phone.scale < 0.6),
+    "el iPhone no escala el lienzo de escritorio: " + JSON.stringify(phone),
+  );
+  const phoneShot = await shot(cdp, "index-iphone-light");
+
   ws.close();
-  const report = { ok: failures.length === 0, failures, shots: [indexShot] };
+  const report = {
+    ok: failures.length === 0,
+    failures,
+    phone,
+    theme: { light: lightM.bg, dark: darkM.bg },
+    shots: [indexShot, countersShot, darkShot, sopaShot, phoneShot],
+  };
   writeFileSync(`${OUT}/report.json`, JSON.stringify(report, null, 2));
   console.log(JSON.stringify(report, null, 2));
   stop();

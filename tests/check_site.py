@@ -54,6 +54,8 @@ REQUIRED_HREFS = [
     "https://github.com/ardu01/Control-deck/tree/HEAD/software/interface",
     "https://github.com/ardu01/sopa-web",
     "https://github.com/ardu01/orbit-web",
+    "#inicio",
+    "#contenido",
     "#prioritario",
     "#secundario",
     "#terminado",
@@ -175,6 +177,8 @@ class SiteTests(unittest.TestCase):
         self.assertIn("Repositorio privado", card)
         self.assertNotIn(PRIVATE_REPO, card)
         self.assertFalse((ROOT / "zalmann-os").exists())
+        self.assertFalse((ROOT / "red-casa").exists())
+        self.assertFalse((ROOT / "storage-hub").exists())
 
     def test_internal_links_resolve(self) -> None:
         for page, parser in ((INDEX, self.index),):
@@ -188,14 +192,93 @@ class SiteTests(unittest.TestCase):
                     text = target.read_text(encoding="utf-8")
                     self.assertRegex(text, rf'id="{re.escape(frag)}"')
 
+    def test_counters_match_articles(self) -> None:
+        sections = ["prioritario", "secundario", "terminado", "aparcado"]
+        labels = {
+            "prioritario": "prioritarios",
+            "secundario": "secundarios",
+            "terminado": "terminados",
+            "aparcado": "aparcados",
+        }
+        total = 0
+        for index, section in enumerate(sections):
+            start = self.index_text.index(f'id="{section}"')
+            end = (
+                self.index_text.index(f'id="{sections[index + 1]}"')
+                if index + 1 < len(sections)
+                else self.index_text.index("</main>")
+            )
+            chunk = self.index_text[start:end]
+            ids = re.findall(r'<article class="card reveal" id="([^"]+)">', chunk)
+            shown = int(re.search(r'<span class="count">(\d+)</span>', chunk).group(1))
+            self.assertEqual(shown, len(ids), section)
+            header = re.search(
+                rf'<b>(\d+)</b><span class="dot [^"]+"></span>{labels[section]}',
+                self.index_text,
+            )
+            self.assertIsNotNone(header, labels[section])
+            self.assertEqual(int(header.group(1)), len(ids), labels[section])
+            total += len(ids)
+        total_shown = int(
+            re.search(r'class="stat total"><b>(\d+)</b>proyectos', self.index_text).group(1)
+        )
+        self.assertEqual(total_shown, total)
+        self.assertEqual(total, len(ARTICLE_IDS))
+        self.assertIn("Fuente de verdad del catálogo: este index.html.", self.index_text)
+        readme = (ROOT / "README.md").read_text(encoding="utf-8")
+        self.assertIn("fuente de verdad", readme)
+        self.assertIn("no debe regenerar", readme)
+
+    def test_sopacad_tests_stop_at_0_41(self) -> None:
+        card = self.index_text.split('id="cad"', 1)[1].split("</article>", 1)[0]
+        self.assertIn("Antes «CAD Libre»", card)
+        self.assertIn("Bocetos, extrusión y operaciones de sólidos (B-rep).", card)
+        self.assertIn(
+            "Las 431 pruebas automáticas corresponden a las versiones hasta la 0.41.",
+            card,
+        )
+        self.assertIn("La 0.42 es la primera con el nombre SopaCAD", card)
+        self.assertIn("su validación no está documentada en esta ficha.", card)
+        self.assertNotIn("431 pruebas automáticas superadas. Última versión: 0.42", card)
+        self.assertNotIn("0.42, con 431", card)
+
+    def test_accessibility_contract(self) -> None:
+        self.assertIn('lang="es"', self.index_text)
+        self.assertIn('name="viewport" content="width=1124, viewport-fit=cover"', self.index_text)
+        self.assertIn('name="color-scheme" content="light dark"', self.index_text)
+        self.assertIn("prefers-color-scheme:dark", self.index_text)
+        self.assertIn("prefers-reduced-motion:reduce", self.index_text)
+        self.assertIn("forced-colors:active", self.index_text)
+        self.assertIn('class="skip" href="#contenido"', self.index_text)
+        self.assertIn('id="contenido"', self.index_text)
+        self.assertIn('id="inicio"', self.index_text)
+        self.assertIn("a:focus-visible", self.index_text)
+        self.assertIn('aria-label="Secciones del catálogo"', self.index_text)
+        external = re.findall(r"<a\b[^>]*target=\"_blank\"[^>]*>", self.index_text)
+        self.assertGreaterEqual(len(external), 18)
+        for tag in external:
+            self.assertIn("aria-label=", tag, tag)
+            self.assertIn("pestaña nueva", tag, tag)
+            self.assertIn('rel="noopener"', tag, tag)
+
     def test_no_private_repo_link_secrets_or_invented_claims(self) -> None:
         pages = [INDEX, ROOT / "README.md"]
+        banned = [
+            "github.com/" + "ardu01/" + "red-casa",
+            "github.com/" + "ardu01/" + "storage-hub",
+            "192.168.",
+            "BEGIN OPENSSH PRIVATE KEY",
+        ]
+        mac = re.compile(r"\b(?:[0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}\b")
         for page in pages:
             text = page.read_text(encoding="utf-8")
             self.assertNotIn(PRIVATE_REPO, text, page.name)
             for pattern in SECRET_PATTERNS:
                 self.assertIsNone(pattern.search(text), f"{pattern.pattern} en {page.name}")
             self.assertIsNone(re.search(r"github\.com/ardu01/zalmann-os(?!-web)", text), page.name)
+            self.assertIsNone(mac.search(text), page.name)
+            for item in banned:
+                self.assertNotIn(item, text, page.name)
 
 
 if __name__ == "__main__":
