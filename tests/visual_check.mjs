@@ -325,6 +325,90 @@ try {
   const counts = census.result.value;
   check(counts.total === "20", "el total no es 20: " + counts.total);
   check(counts.priority === 3 && counts.secondary === 3 && counts.done === 11 && counts.parked === 3, "los grupos no cuadran: " + JSON.stringify(counts));
+
+  function contrastOf(fg, bg) {
+    const lin = (v) => {
+      const c = v / 255;
+      return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+    };
+    const L = (c) => 0.2126 * lin(c.r) + 0.7152 * lin(c.g) + 0.0722 * lin(c.b);
+    const a = (L(fg) + 0.05) / (L(bg) + 0.05);
+    return a >= 1 ? a : 1 / a;
+  }
+  async function labelReport() {
+    const evaluated = await cdp.send("Runtime.evaluate", {
+      expression: `(() => {
+        const parse = (s) => {
+          const m = String(s).match(/rgba?\\(([^)]+)\\)/);
+          if (!m) return null;
+          const p = m[1].split(",").map((n) => Number(n.trim()));
+          return { r: p[0], g: p[1], b: p[2], a: p.length > 3 ? p[3] : 1 };
+        };
+        const composite = (fg, bg) => ({
+          r: fg.r * fg.a + bg.r * (1 - fg.a),
+          g: fg.g * fg.a + bg.g * (1 - fg.a),
+          b: fg.b * fg.a + bg.b * (1 - fg.a),
+        });
+        const read = (el) => {
+          const cs = getComputedStyle(el);
+          const card = getComputedStyle(el.closest(".card") || el.parentElement);
+          let bg = parse(cs.backgroundColor);
+          const base = parse(card.backgroundColor);
+          if (bg && bg.a < 1 && base) bg = { ...composite(bg, base), a: 1 };
+          return { text: el.textContent.trim(), cls: el.className, color: parse(cs.color), bg };
+        };
+        return {
+          done: [...document.querySelectorAll("#terminado article .pill.ok")].map(read),
+          dev: [...document.querySelectorAll("#prioritario article .pill.dev, #secundario article .pill.dev")].map(read),
+          pause: document.querySelector("#aparcado h2").childNodes[0].textContent.trim(),
+          nav: document.querySelector('a[href="#aparcado"]').textContent.trim(),
+        };
+      })()`,
+      returnByValue: true,
+    });
+    return evaluated.result.value;
+  }
+  await setView(cdp, 1440, 900, "light", false);
+  await cdp.send("Runtime.evaluate", { expression: `document.querySelector("#terminado").scrollIntoView({block:"start"})` });
+  await delay(200);
+  const lightLabels = await labelReport();
+  check(lightLabels.done.length === 11, "en claro no hay 11 etiquetas verdes");
+  check(lightLabels.dev.length === 4, "en claro no hay 4 etiquetas En desarrollo");
+  check(lightLabels.pause.startsWith("En pausa") && lightLabels.nav === "En pausa", "el texto visible no es En pausa");
+  for (const pill of lightLabels.done) {
+    check(pill.text === "Terminado / mantener", "etiqueta verde distinta: " + pill.text);
+    check(contrastOf(pill.color, pill.bg) >= 4.5, "contraste verde claro " + contrastOf(pill.color, pill.bg).toFixed(2));
+    check(pill.color.g > pill.color.r && pill.color.g > pill.color.b, "la etiqueta de terminado no es verde");
+  }
+  for (const pill of lightLabels.dev) {
+    check(pill.text === "En desarrollo", "etiqueta de desarrollo distinta");
+    check(contrastOf(pill.color, pill.bg) >= 4.5, "contraste naranja claro " + contrastOf(pill.color, pill.bg).toFixed(2));
+    check(pill.color.r > pill.color.g, "En desarrollo no es naranja");
+  }
+  const lightDone = await shot(cdp, "etiquetas-terminado-claro");
+  await cdp.send("Runtime.evaluate", { expression: `document.querySelector("#sopa-ia").scrollIntoView({block:"center"})` });
+  await delay(150);
+  const lightDev = await shot(cdp, "etiquetas-prioritario-claro");
+  await cdp.send("Runtime.evaluate", { expression: `document.querySelector("#cad").scrollIntoView({block:"center"})` });
+  await delay(150);
+  const lightCad = await shot(cdp, "etiquetas-sopacad-claro");
+  await setView(cdp, 1440, 900, "dark", false);
+  await cdp.send("Runtime.evaluate", { expression: `document.querySelector("#terminado").scrollIntoView({block:"start"})` });
+  await delay(200);
+  const darkLabels = await labelReport();
+  check(darkLabels.done.length === 11 && darkLabels.dev.length === 4, "en oscuro faltan etiquetas");
+  for (const pill of darkLabels.done) {
+    check(contrastOf(pill.color, pill.bg) >= 4.5, "contraste verde oscuro " + contrastOf(pill.color, pill.bg).toFixed(2));
+    check(pill.color.g > pill.color.r, "en oscuro la etiqueta de terminado no es verde");
+  }
+  for (const pill of darkLabels.dev) {
+    check(contrastOf(pill.color, pill.bg) >= 4.5, "contraste naranja oscuro " + contrastOf(pill.color, pill.bg).toFixed(2));
+    check(pill.color.r > pill.color.b, "en oscuro En desarrollo no es naranja");
+  }
+  const darkDone = await shot(cdp, "etiquetas-terminado-oscuro");
+  await cdp.send("Runtime.evaluate", { expression: `document.querySelector("#sopa-ia").scrollIntoView({block:"center"})` });
+  await delay(150);
+  const darkDev = await shot(cdp, "etiquetas-prioritario-oscuro");
   check(counts.red === "red-casa/" && counts.hub === "storage-hub/", "las fichas nuevas no enlazan sus páginas");
 
   const pageShots = [];
@@ -429,7 +513,7 @@ try {
     phone,
     counts,
     theme: { light: lightM.bg, dark: darkM.bg },
-    shots: [indexShot, countersShot, darkShot, sopaShot, phoneShot, ...pageShots],
+    shots: [indexShot, countersShot, darkShot, sopaShot, phoneShot, lightDone, lightDev, lightCad, darkDone, darkDev, ...pageShots],
   };
   writeFileSync(`${OUT}/report.json`, JSON.stringify(report, null, 2));
   console.log(JSON.stringify(report, null, 2));

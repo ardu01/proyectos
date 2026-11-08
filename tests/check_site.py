@@ -153,7 +153,10 @@ class SiteTests(unittest.TestCase):
         self.assertIn(">3</b><span class=\"dot hi\"></span>prioritarios", self.index_text)
         self.assertIn(">3</b><span class=\"dot dev\"></span>secundarios", self.index_text)
         self.assertIn(">11</b><span class=\"dot ok\"></span>terminados", self.index_text)
-        self.assertIn(">3</b><span class=\"dot idea\"></span>aparcados", self.index_text)
+        self.assertIn(">3</b><span class=\"dot idea\"></span>en pausa", self.index_text)
+        self.assertNotIn("aparcados", self.index_text)
+        self.assertNotIn(">Aparcado<", self.index_text)
+        self.assertIn('href="#aparcado">En pausa</a>', self.index_text)
         priority = self.index_text.split('id="prioritario"', 1)[1].split('id="secundario"', 1)[0]
         self.assertIn('<span class="count">3</span>', priority)
         self.assertLess(priority.index("sopa-ia"), priority.index("jerry"))
@@ -168,6 +171,16 @@ class SiteTests(unittest.TestCase):
         self.assertIn('<span class="count">11</span>', finished)
         self.assertLess(finished.index("rea-codex"), finished.index("red-casa"))
         self.assertLess(finished.index("red-casa"), finished.index("storage-hub"))
+        self.assertEqual(finished.count('class="pill ok">Terminado / mantener'), 11)
+        for name in ("avatar-engine", "os-apple", "motor-ligero", "axiom-lab", "android-deck"):
+            card = self.index_text.split(f'id="{name}"', 1)[1].split("</article>", 1)[0]
+            self.assertNotIn('class="pill ok"', card, name)
+            self.assertNotIn('class="pill dev"', card, name)
+        for name in ("sopa-ia", "jerry", "zalmann-os", "cad"):
+            card = self.index_text.split(f'id="{name}"', 1)[1].split("</article>", 1)[0]
+            self.assertIn('class="pill dev">En desarrollo', card, name)
+            self.assertNotIn('class="pill ok"', card, name)
+        self.assertEqual(secondary.count('class="pill dev">En desarrollo'), 1)
 
     def test_existing_links_and_cards_remain(self) -> None:
         for href in REQUIRED_HREFS:
@@ -211,7 +224,7 @@ class SiteTests(unittest.TestCase):
             "prioritario": "prioritarios",
             "secundario": "secundarios",
             "terminado": "terminados",
-            "aparcado": "aparcados",
+            "aparcado": "en pausa",
         }
         total = 0
         for index, section in enumerate(sections):
