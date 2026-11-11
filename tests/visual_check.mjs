@@ -319,12 +319,23 @@ try {
       parked: document.querySelectorAll("#aparcado article").length,
       red: document.querySelector("#red-casa a.btn.primary").getAttribute("href"),
       hub: document.querySelector("#storage-hub a.btn.primary").getAttribute("href"),
+      towerSection: document.querySelector("#tower-defense").closest("section").id,
+      towerLinks: document.querySelectorAll("#tower-defense a").length,
+      towerNote: document.querySelector("#tower-defense .localnote").textContent,
+      orbitRepo: document.querySelector("#orbit-os a.btn").getAttribute("href"),
+      terminalRepo: [...document.querySelectorAll("#orbit-terminal a.btn")].map((a) => a.getAttribute("href")),
+      sopaName: document.querySelector("#cad h3").textContent,
     }))()`,
     returnByValue: true,
   });
   const counts = census.result.value;
   check(counts.total === "22", "el total no es 22: " + counts.total);
-  check(counts.priority === 3 && counts.secondary === 4 && counts.done === 12 && counts.parked === 3, "los grupos no cuadran: " + JSON.stringify(counts));
+  check(counts.priority === 3 && counts.secondary === 4 && counts.done === 11 && counts.parked === 4, "los grupos no cuadran: " + JSON.stringify(counts));
+  check(counts.towerSection === "aparcado" && counts.towerLinks === 0, "Tower Defense no está en pausa sin enlaces: " + JSON.stringify(counts));
+  check(counts.towerNote === "Repositorio y web retirados temporalmente.", "falta la nota de Tower Defense: " + counts.towerNote);
+  check(counts.orbitRepo === "https://github.com/ardu01/Orbit-OS", "Orbit OS no apunta a Orbit-OS");
+  check(counts.terminalRepo.includes("https://github.com/ardu01/Orbit-OS") && !counts.terminalRepo.some((href) => href.includes("Control-deck")), "Orbit Terminal sigue en Control-deck");
+  check(counts.sopaName === "SopaCAD", "el nombre visible no es SopaCAD");
 
   function contrastOf(fg, bg) {
     const lin = (v) => {
@@ -372,7 +383,7 @@ try {
   await cdp.send("Runtime.evaluate", { expression: `document.querySelector("#terminado").scrollIntoView({block:"start"})` });
   await delay(200);
   const lightLabels = await labelReport();
-  check(lightLabels.done.length === 12, "en claro no hay 12 etiquetas verdes");
+  check(lightLabels.done.length === 11, "en claro no hay 11 etiquetas verdes");
   check(lightLabels.dev.length === 5, "en claro no hay 5 etiquetas En desarrollo");
   check(lightLabels.pause.startsWith("En pausa") && lightLabels.nav === "En pausa", "el texto visible no es En pausa");
   for (const pill of lightLabels.done) {
@@ -399,7 +410,7 @@ try {
   await cdp.send("Runtime.evaluate", { expression: `document.querySelector("#terminado").scrollIntoView({block:"start"})` });
   await delay(200);
   const darkLabels = await labelReport();
-  check(darkLabels.done.length === 12 && darkLabels.dev.length === 5, "en oscuro faltan etiquetas");
+  check(darkLabels.done.length === 11 && darkLabels.dev.length === 5, "en oscuro faltan etiquetas");
   for (const pill of darkLabels.done) {
     check(contrastOf(pill.color, pill.bg) >= 4.5, "contraste verde oscuro " + contrastOf(pill.color, pill.bg).toFixed(2));
     check(pill.color.g > pill.color.r, "en oscuro la etiqueta de terminado no es verde");

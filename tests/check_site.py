@@ -28,7 +28,6 @@ ARTICLE_IDS = [
     "sopa-web",
     "orbit-web",
     "fairway",
-    "tower-defense",
     "clash-progreso",
     "monitor-msi",
     "rea-codex",
@@ -38,6 +37,7 @@ ARTICLE_IDS = [
     "motor-ligero",
     "axiom-lab",
     "android-deck",
+    "tower-defense",
 ]
 
 REQUIRED_HREFS = [
@@ -48,14 +48,11 @@ REQUIRED_HREFS = [
     "https://ardu01.github.io/app-golf/",
     "https://github.com/ardu01/app-golf",
     "https://github.com/ardu01/app-golf/releases/tag/v5.1.6",
-    "https://ardu01.github.io/Tower-defense/",
-    "https://github.com/ardu01/Tower-defense",
     "https://ardu01.github.io/clash-progreso/",
     "https://github.com/ardu01/clash-progreso",
     "https://ardu01.github.io/axiom-lab/",
     "https://github.com/ardu01/axiom-lab",
-    "https://github.com/ardu01/Control-deck",
-    "https://github.com/ardu01/Control-deck/tree/HEAD/software/interface",
+    "https://github.com/ardu01/Orbit-OS",
     "https://github.com/ardu01/sopa-web",
     "https://github.com/ardu01/orbit-web",
     "#inicio",
@@ -157,8 +154,8 @@ class SiteTests(unittest.TestCase):
         self.assertIn(">22</b>proyectos", self.index_text)
         self.assertIn(">3</b><span class=\"dot hi\"></span>prioritarios", self.index_text)
         self.assertIn(">4</b><span class=\"dot dev\"></span>secundarios", self.index_text)
-        self.assertIn(">12</b><span class=\"dot ok\"></span>terminados", self.index_text)
-        self.assertIn(">3</b><span class=\"dot idea\"></span>en pausa", self.index_text)
+        self.assertIn(">11</b><span class=\"dot ok\"></span>terminados", self.index_text)
+        self.assertIn(">4</b><span class=\"dot idea\"></span>en pausa", self.index_text)
         self.assertNotIn("aparcados", self.index_text)
         self.assertNotIn(">Aparcado<", self.index_text)
         self.assertIn('href="#aparcado">En pausa</a>', self.index_text)
@@ -175,11 +172,41 @@ class SiteTests(unittest.TestCase):
         self.assertNotIn("red-casa", secondary)
         self.assertNotIn("storage-hub", secondary)
         finished = self.index_text.split('id="terminado"', 1)[1].split('id="aparcado"', 1)[0]
-        self.assertIn('<span class="count">12</span>', finished)
+        self.assertIn('<span class="count">11</span>', finished)
         self.assertLess(finished.index("rea-codex"), finished.index("red-casa"))
         self.assertLess(finished.index("red-casa"), finished.index("storage-hub"))
         self.assertLess(finished.index("storage-hub"), finished.index("bandeja-zalman-r1"))
-        self.assertEqual(finished.count('class="pill ok">Terminado / mantener'), 12)
+        self.assertEqual(finished.count('class="pill ok">Terminado / mantener'), 11)
+        self.assertNotIn("tower-defense", finished)
+        self.assertNotIn("Control-deck", self.index_text)
+        self.assertNotIn("Tower-defense", self.index_text)
+        parked = self.index_text.split('id="aparcado"', 1)[1].split("</main>", 1)[0]
+        self.assertIn('<span class="count">4</span>', parked)
+        self.assertLess(parked.index("android-deck"), parked.index("tower-defense"))
+        tower = parked.split('id="tower-defense"', 1)[1].split("</article>", 1)[0]
+        self.assertIn("Repositorio y web retirados temporalmente.", tower)
+        self.assertNotIn("<a ", tower)
+        self.assertNotIn('class="pill ok"', tower)
+        self.assertNotIn('class="pill dev"', tower)
+        dates = {
+            "sopa-ia": "4 nov 2026",
+            "jerry": "9 nov 2026",
+            "zalmann-os": "8 nov 2026",
+            "sopa-web": "4 nov 2026",
+            "orbit-web": "30 oct 2026",
+            "orbit-terminal": "30 oct 2026",
+            "orbit-os": "30 oct 2026",
+        }
+        for name, date in dates.items():
+            card = self.index_text.split(f'id="{name}"', 1)[1].split("</article>", 1)[0]
+            self.assertIn(f"Actualizado el {date}", card, name)
+        terminal = self.index_text.split('id="orbit-terminal"', 1)[1].split("</article>", 1)[0]
+        orbit = self.index_text.split('id="orbit-os"', 1)[1].split("</article>", 1)[0]
+        self.assertIn("El repositorio se llama Orbit-OS.", terminal)
+        self.assertIn('href="https://github.com/ardu01/Orbit-OS"', terminal)
+        self.assertIn("Vive dentro del repositorio Orbit-OS.", orbit)
+        self.assertIn('href="https://github.com/ardu01/Orbit-OS"', orbit)
+        self.assertNotIn("software/interface", orbit)
         tray = self.index_text.split('id="bandeja-zalman-r1"', 1)[1].split("</article>", 1)[0]
         self.assertIn("Bandeja para disco duro de 3,5 pulgadas diseñada para la torre Zalman R1.", tray)
         self.assertIn("STL disponible. Archivo editable pendiente de publicación.", tray)
@@ -298,6 +325,12 @@ class SiteTests(unittest.TestCase):
             card,
         )
         self.assertIn("La 0.42 es la primera con el nombre SopaCAD", card)
+        self.assertIn(">SopaCAD</h3>", card)
+        self.assertIn('aria-label="Ver la web de SopaCAD (se abre en una pestaña nueva)"', card)
+        visible = re.sub(r"<[^>]+>", " ", card)
+        self.assertIn("SopaCAD", visible)
+        self.assertNotIn("SopaCad", visible)
+        self.assertNotIn("Sopa CAD", visible)
         self.assertIn("su validación no está documentada en esta ficha.", card)
         self.assertNotIn("431 pruebas automáticas superadas. Última versión: 0.42", card)
         self.assertNotIn("0.42, con 431", card)
