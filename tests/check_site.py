@@ -63,6 +63,7 @@ REQUIRED_HREFS = [
     "#terminado",
     "#aparcado",
     "https://ardu01.github.io/zalmann-os-web/",
+    "https://ardu01.github.io/musa-web/",
     "https://github.com/ardu01/zalman-r1-bandeja-hdd-3.5",
     "https://github.com/ardu01/rea-studio",
     "https://github.com/ardu01/rea-studio/releases/tag/v0.1.0",
@@ -271,7 +272,12 @@ class SiteTests(unittest.TestCase):
         self.assertIn("Licencia GPL-3.0-only.", musa)
         self.assertIn("Empezado el 11 nov 2026", musa)
         self.assertIn("Repositorio privado", musa)
-        self.assertNotIn("<a ", musa)
+        self.assertIn(
+            'href="https://ardu01.github.io/musa-web/" target="_blank" rel="noopener"',
+            musa,
+        )
+        self.assertIn('aria-label="Ver la web de Musa (se abre en una pestaña nueva)"', musa)
+        self.assertIn(">Ver web</a>", musa)
         self.assertNotIn("github.com", musa)
         self.assertNotIn("<img", musa)
         codex = self.index_text.split('id="rea-codex"', 1)[1].split("</article>", 1)[0]

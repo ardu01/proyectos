@@ -342,6 +342,8 @@ try {
       reaHrefs: [...document.querySelectorAll("#rea-studio a")].map((a) => a.getAttribute("href")),
       musa: document.querySelector("#musa").innerText,
       musaLinks: document.querySelectorAll("#musa a").length,
+      musaHref: document.querySelector("#musa a") && document.querySelector("#musa a").getAttribute("href"),
+      musaRel: document.querySelector("#musa a") && document.querySelector("#musa a").getAttribute("rel"),
       musaSection: document.querySelector("#musa").closest("section").id,
     }))()`,
     returnByValue: true,
@@ -360,8 +362,9 @@ try {
   check(counts.monitor.includes("Versión 1.2.0") && counts.monitor.includes("Actualizado el 15 nov 2026") && counts.monitorLinks === 0, "Monitor Hardware MSI no está en 1.2.0 sin enlaces");
   check(counts.rea.includes("Vista previa · v0.1.0") && counts.rea.includes("macOS Intel x64 · prueba") && counts.rea.includes("Actualizado el 15 nov 2026"), "REA Studio no conserva la descarga de Windows ni la prueba de macOS");
   check(counts.reaHrefs.includes("https://github.com/ardu01/rea-studio/releases/tag/v0.1.0") && counts.reaHrefs.includes("https://github.com/ardu01/rea-studio/releases/tag/v0.1.0-macos-x64"), "faltan las publicaciones públicas de REA Studio");
-  check(counts.musaSection === "secundario" && counts.musaLinks === 0, "Musa no está en Secundario sin enlaces");
-  check(counts.musa.includes("Musa") && counts.musa.includes("GPL-3.0-only") && counts.musa.includes("Empezado el 11 nov 2026") && counts.musa.includes("Repositorio privado") && !counts.musa.includes("github.com"), "la ficha de Musa no cuadra");
+  check(counts.musaSection === "secundario" && counts.musaLinks === 1, "Musa no está en Secundario con un enlace a su web");
+  check(counts.musaHref === "https://ardu01.github.io/musa-web/" && counts.musaRel === "noopener", "la web de Musa no abre como el resto de fichas");
+  check(counts.musa.includes("Musa") && counts.musa.includes("Ver web") && counts.musa.includes("GPL-3.0-only") && counts.musa.includes("Empezado el 11 nov 2026") && counts.musa.includes("Repositorio privado") && !counts.musa.includes("github.com"), "la ficha de Musa no cuadra");
 
   function contrastOf(fg, bg) {
     const lin = (v) => {
