@@ -23,6 +23,7 @@ ARTICLE_IDS = [
     "cad",
     "os-apple",
     "rea-studio",
+    "musa",
     "orbit-terminal",
     "orbit-os",
     "sopa-web",
@@ -65,6 +66,7 @@ REQUIRED_HREFS = [
     "https://github.com/ardu01/zalman-r1-bandeja-hdd-3.5",
     "https://github.com/ardu01/rea-studio",
     "https://github.com/ardu01/rea-studio/releases/tag/v0.1.0",
+    "https://github.com/ardu01/rea-studio/releases/tag/v0.1.0-macos-x64",
     "red-casa/",
     "storage-hub/",
 ]
@@ -150,10 +152,10 @@ class SiteTests(unittest.TestCase):
     def test_catalog_counts_and_order(self) -> None:
         ids = re.findall(r'<article class="card reveal" id="([^"]+)">', self.index_text)
         self.assertEqual(ids, ARTICLE_IDS)
-        self.assertEqual(len(ids), 22)
-        self.assertIn(">22</b>proyectos", self.index_text)
+        self.assertEqual(len(ids), 23)
+        self.assertIn(">23</b>proyectos", self.index_text)
         self.assertIn(">3</b><span class=\"dot hi\"></span>prioritarios", self.index_text)
-        self.assertIn(">4</b><span class=\"dot dev\"></span>secundarios", self.index_text)
+        self.assertIn(">5</b><span class=\"dot dev\"></span>secundarios", self.index_text)
         self.assertIn(">11</b><span class=\"dot ok\"></span>terminados", self.index_text)
         self.assertIn(">4</b><span class=\"dot idea\"></span>en pausa", self.index_text)
         self.assertNotIn("aparcados", self.index_text)
@@ -164,11 +166,12 @@ class SiteTests(unittest.TestCase):
         self.assertLess(priority.index("sopa-ia"), priority.index("jerry"))
         self.assertLess(priority.index("jerry"), priority.index("zalmann-os"))
         secondary = self.index_text.split('id="secundario"', 1)[1].split('id="terminado"', 1)[0]
-        self.assertIn('<span class="count">4</span>', secondary)
-        for name in ("avatar-engine", "cad", "os-apple", "rea-studio"):
+        self.assertIn('<span class="count">5</span>', secondary)
+        for name in ("avatar-engine", "cad", "os-apple", "rea-studio", "musa"):
             self.assertIn(name, secondary)
         self.assertLess(secondary.index("os-apple"), secondary.index("rea-studio"))
-        self.assertEqual(secondary.count('class="pill dev">En desarrollo'), 2)
+        self.assertLess(secondary.index("rea-studio"), secondary.index("musa"))
+        self.assertEqual(secondary.count('class="pill dev">En desarrollo'), 3)
         self.assertNotIn("red-casa", secondary)
         self.assertNotIn("storage-hub", secondary)
         finished = self.index_text.split('id="terminado"', 1)[1].split('id="aparcado"', 1)[0]
@@ -189,10 +192,12 @@ class SiteTests(unittest.TestCase):
         self.assertNotIn('class="pill ok"', tower)
         self.assertNotIn('class="pill dev"', tower)
         dates = {
-            "sopa-ia": "4 nov 2026",
+            "sopa-ia": "13 nov 2026",
             "jerry": "9 nov 2026",
             "zalmann-os": "8 nov 2026",
-            "sopa-web": "4 nov 2026",
+            "sopa-web": "14 nov 2026",
+            "monitor-msi": "15 nov 2026",
+            "rea-studio": "15 nov 2026",
             "orbit-web": "30 oct 2026",
             "orbit-terminal": "30 oct 2026",
             "orbit-os": "30 oct 2026",
@@ -226,7 +231,7 @@ class SiteTests(unittest.TestCase):
             card = self.index_text.split(f'id="{name}"', 1)[1].split("</article>", 1)[0]
             self.assertNotIn('class="pill ok"', card, name)
             self.assertNotIn('class="pill dev"', card, name)
-        for name in ("sopa-ia", "jerry", "zalmann-os", "cad", "rea-studio"):
+        for name in ("sopa-ia", "jerry", "zalmann-os", "cad", "rea-studio", "musa"):
             card = self.index_text.split(f'id="{name}"', 1)[1].split("</article>", 1)[0]
             self.assertIn('class="pill dev">En desarrollo', card, name)
             self.assertNotIn('class="pill ok"', card, name)
@@ -236,8 +241,39 @@ class SiteTests(unittest.TestCase):
         self.assertIn("Vista previa 0.1.0, licencia MIT", studio)
         self.assertIn("el instalador no está firmado", studio)
         self.assertIn("17 pruebas", studio)
+        self.assertIn("El instalador de Windows de 64 bits sigue siendo la descarga principal.", studio)
+        self.assertIn("paquete de prueba para macOS Intel x64, sin firmar, publicado el 10 nov 2026.", studio)
+        self.assertIn('href="https://github.com/ardu01/rea-studio/releases/tag/v0.1.0"', studio)
+        self.assertIn(">Vista previa · v0.1.0</a>", studio)
+        self.assertIn('href="https://github.com/ardu01/rea-studio/releases/tag/v0.1.0-macos-x64"', studio)
+        self.assertLess(
+            studio.index("/releases/tag/v0.1.0\""),
+            studio.index("/releases/tag/v0.1.0-macos-x64"),
+        )
         self.assertNotIn('class="pill ok"', studio)
         self.assertNotIn("rea-studio-web", studio)
+        sopa = self.index_text.split('id="sopa-ia"', 1)[1].split("</article>", 1)[0]
+        self.assertIn("Ahora está en Sopa 2.3.0", sopa)
+        self.assertIn("funciones multimedia locales «en pruebas»", sopa)
+        self.assertIn("visión y OCR, documentos (Word, Excel, PowerPoint y PDF), voz, imágenes y vídeo.", sopa)
+        self.assertNotIn("github.com", sopa)
+        web = self.index_text.split('id="sopa-web"', 1)[1].split("</article>", 1)[0]
+        self.assertIn("La web presenta ahora Sopa 2.3.0.", web)
+        monitor = self.index_text.split('id="monitor-msi"', 1)[1].split("</article>", 1)[0]
+        self.assertIn("Versión 1.2.0, con pestañas para la torre Zalmann y la tercera torre", monitor)
+        self.assertIn("un agente de Linux de solo lectura y controles de encendido y apagado.", monitor)
+        self.assertNotIn("<a ", monitor)
+        self.assertNotIn("github.com", monitor)
+        musa = self.index_text.split('id="musa"', 1)[1].split("</article>", 1)[0]
+        self.assertIn("Estudio de música tipo editor de vídeo para audio, con IA local integrada.", musa)
+        self.assertIn("Órdenes en lenguaje natural sobre la zona marcada y generación de música en la GPU.", musa)
+        self.assertIn("la fase 1 (multipista, asistente local y generación ACE-Step) está en desarrollo.", musa)
+        self.assertIn("Licencia GPL-3.0-only.", musa)
+        self.assertIn("Empezado el 11 nov 2026", musa)
+        self.assertIn("Repositorio privado", musa)
+        self.assertNotIn("<a ", musa)
+        self.assertNotIn("github.com", musa)
+        self.assertNotIn("<img", musa)
         codex = self.index_text.split('id="rea-codex"', 1)[1].split("</article>", 1)[0]
         self.assertIn("REA Codex", codex)
         self.assertIn('class="pill ok">Terminado / mantener', codex)
@@ -429,6 +465,7 @@ class SiteTests(unittest.TestCase):
         banned = [
             "github.com/" + "ardu01/" + "red-casa",
             "github.com/" + "ardu01/" + "storage-hub",
+            "github.com/" + "ardu01/" + "musa",
             "192.168.",
             "BEGIN OPENSSH PRIVATE KEY",
         ]

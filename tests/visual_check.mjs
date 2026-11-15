@@ -309,6 +309,15 @@ try {
     "el iPhone no escala el lienzo de escritorio: " + JSON.stringify(phone),
   );
   const phoneShot = await shot(cdp, "index-iphone-light");
+  await cdp.send("Runtime.evaluate", { expression: `document.querySelector("#sopa-ia").scrollIntoView({block:"center"})` });
+  await delay(250);
+  const phoneSopa = await shot(cdp, "ficha-sopa-ia-iphone");
+  await cdp.send("Runtime.evaluate", { expression: `document.querySelector("#musa").scrollIntoView({block:"center"})` });
+  await delay(250);
+  const phoneMusa = await shot(cdp, "ficha-musa-iphone");
+  await cdp.send("Runtime.evaluate", { expression: `document.querySelector("#monitor-msi").scrollIntoView({block:"center"})` });
+  await delay(250);
+  const phoneMonitor = await shot(cdp, "ficha-monitor-msi-iphone");
 
   const census = await cdp.send("Runtime.evaluate", {
     expression: `(() => ({
@@ -325,17 +334,34 @@ try {
       orbitRepo: document.querySelector("#orbit-os a.btn").getAttribute("href"),
       terminalRepo: [...document.querySelectorAll("#orbit-terminal a.btn")].map((a) => a.getAttribute("href")),
       sopaName: document.querySelector("#cad h3").textContent,
+      sopaIa: document.querySelector("#sopa-ia").innerText,
+      sopaWeb: document.querySelector("#sopa-web").innerText,
+      monitor: document.querySelector("#monitor-msi").innerText,
+      monitorLinks: document.querySelectorAll("#monitor-msi a").length,
+      rea: document.querySelector("#rea-studio").innerText,
+      reaHrefs: [...document.querySelectorAll("#rea-studio a")].map((a) => a.getAttribute("href")),
+      musa: document.querySelector("#musa").innerText,
+      musaLinks: document.querySelectorAll("#musa a").length,
+      musaSection: document.querySelector("#musa").closest("section").id,
     }))()`,
     returnByValue: true,
   });
   const counts = census.result.value;
-  check(counts.total === "22", "el total no es 22: " + counts.total);
-  check(counts.priority === 3 && counts.secondary === 4 && counts.done === 11 && counts.parked === 4, "los grupos no cuadran: " + JSON.stringify(counts));
+  check(counts.total === "23", "el total no es 23: " + counts.total);
+  check(counts.priority === 3 && counts.secondary === 5 && counts.done === 11 && counts.parked === 4, "los grupos no cuadran: " + JSON.stringify(counts));
   check(counts.towerSection === "aparcado" && counts.towerLinks === 0, "Tower Defense no está en pausa sin enlaces: " + JSON.stringify(counts));
   check(counts.towerNote === "Repositorio y web retirados temporalmente.", "falta la nota de Tower Defense: " + counts.towerNote);
   check(counts.orbitRepo === "https://github.com/ardu01/Orbit-OS", "Orbit OS no apunta a Orbit-OS");
   check(counts.terminalRepo.includes("https://github.com/ardu01/Orbit-OS") && !counts.terminalRepo.some((href) => href.includes("Control-deck")), "Orbit Terminal sigue en Control-deck");
   check(counts.sopaName === "SopaCAD", "el nombre visible no es SopaCAD");
+  check(counts.sopaIa.includes("Sopa 2.3.0") && counts.sopaIa.includes("«en pruebas»") && counts.sopaIa.includes("Actualizado el 13 nov 2026"), "SOPA IA no muestra la 2.3.0 en pruebas");
+  check(!counts.sopaIa.includes("github.com"), "SOPA IA no debe enlazar un repositorio");
+  check(counts.sopaWeb.includes("La web presenta ahora Sopa 2.3.0.") && counts.sopaWeb.includes("Actualizado el 14 nov 2026"), "SOPA Web no presenta la 2.3.0");
+  check(counts.monitor.includes("Versión 1.2.0") && counts.monitor.includes("Actualizado el 15 nov 2026") && counts.monitorLinks === 0, "Monitor Hardware MSI no está en 1.2.0 sin enlaces");
+  check(counts.rea.includes("Vista previa · v0.1.0") && counts.rea.includes("macOS Intel x64 · prueba") && counts.rea.includes("Actualizado el 15 nov 2026"), "REA Studio no conserva la descarga de Windows ni la prueba de macOS");
+  check(counts.reaHrefs.includes("https://github.com/ardu01/rea-studio/releases/tag/v0.1.0") && counts.reaHrefs.includes("https://github.com/ardu01/rea-studio/releases/tag/v0.1.0-macos-x64"), "faltan las publicaciones públicas de REA Studio");
+  check(counts.musaSection === "secundario" && counts.musaLinks === 0, "Musa no está en Secundario sin enlaces");
+  check(counts.musa.includes("Musa") && counts.musa.includes("GPL-3.0-only") && counts.musa.includes("Empezado el 11 nov 2026") && counts.musa.includes("Repositorio privado") && !counts.musa.includes("github.com"), "la ficha de Musa no cuadra");
 
   function contrastOf(fg, bg) {
     const lin = (v) => {
@@ -384,7 +410,7 @@ try {
   await delay(200);
   const lightLabels = await labelReport();
   check(lightLabels.done.length === 11, "en claro no hay 11 etiquetas verdes");
-  check(lightLabels.dev.length === 5, "en claro no hay 5 etiquetas En desarrollo");
+  check(lightLabels.dev.length === 6, "en claro no hay 6 etiquetas En desarrollo");
   check(lightLabels.pause.startsWith("En pausa") && lightLabels.nav === "En pausa", "el texto visible no es En pausa");
   for (const pill of lightLabels.done) {
     check(pill.text === "Terminado / mantener", "etiqueta verde distinta: " + pill.text);
@@ -406,11 +432,23 @@ try {
   await cdp.send("Runtime.evaluate", { expression: `document.querySelector("#rea-studio").scrollIntoView({block:"center"})` });
   await delay(200);
   const lightStudio = await shot(cdp, "ficha-rea-studio-claro");
+  await cdp.send("Runtime.evaluate", { expression: `document.querySelector("#sopa-ia").scrollIntoView({block:"center"})` });
+  await delay(200);
+  const lightSopaIa = await shot(cdp, "ficha-sopa-ia-claro");
+  await cdp.send("Runtime.evaluate", { expression: `document.querySelector("#musa").scrollIntoView({block:"center"})` });
+  await delay(200);
+  const lightMusa = await shot(cdp, "ficha-musa-claro");
+  await cdp.send("Runtime.evaluate", { expression: `document.querySelector("#sopa-web").scrollIntoView({block:"center"})` });
+  await delay(200);
+  const lightSopaWeb = await shot(cdp, "ficha-sopa-web-claro");
+  await cdp.send("Runtime.evaluate", { expression: `document.querySelector("#monitor-msi").scrollIntoView({block:"center"})` });
+  await delay(200);
+  const lightMonitor = await shot(cdp, "ficha-monitor-msi-claro");
   await setView(cdp, 1440, 900, "dark", false);
   await cdp.send("Runtime.evaluate", { expression: `document.querySelector("#terminado").scrollIntoView({block:"start"})` });
   await delay(200);
   const darkLabels = await labelReport();
-  check(darkLabels.done.length === 11 && darkLabels.dev.length === 5, "en oscuro faltan etiquetas");
+  check(darkLabels.done.length === 11 && darkLabels.dev.length === 6, "en oscuro faltan etiquetas");
   for (const pill of darkLabels.done) {
     check(contrastOf(pill.color, pill.bg) >= 4.5, "contraste verde oscuro " + contrastOf(pill.color, pill.bg).toFixed(2));
     check(pill.color.g > pill.color.r, "en oscuro la etiqueta de terminado no es verde");
@@ -527,7 +565,7 @@ try {
     phone,
     counts,
     theme: { light: lightM.bg, dark: darkM.bg },
-    shots: [indexShot, countersShot, darkShot, sopaShot, phoneShot, lightDone, lightDev, lightCad, lightStudio, darkDone, darkDev, ...pageShots],
+    shots: [indexShot, countersShot, darkShot, sopaShot, phoneShot, phoneSopa, phoneMusa, phoneMonitor, lightDone, lightDev, lightCad, lightStudio, lightSopaIa, lightMusa, lightSopaWeb, lightMonitor, darkDone, darkDev, ...pageShots],
   };
   writeFileSync(`${OUT}/report.json`, JSON.stringify(report, null, 2));
   console.log(JSON.stringify(report, null, 2));
